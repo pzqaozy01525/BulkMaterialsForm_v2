@@ -1,0 +1,45 @@
+# Build outputs
+bin/
+obj/
+publish/
+out/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+Log/
+*.log
+
+# Runtime/runtime configs
+*.ini
+!formRKpz.ini
+
+# Temporary/cache files
+Cache/
+msc/
+*.tmp
+*.cache
+
+# SDK third-party DLLs (large binary dependencies)
+*.dll
+!app.ico
+
+# Large binaries not needed in repo
+BulkMaterialsForm.exe
+BulkMaterialsForm.pdb
+MSSQL2008-HaoSQL.exe
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# VLC runtime
+libvlc/

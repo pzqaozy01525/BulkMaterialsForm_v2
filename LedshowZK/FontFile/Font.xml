@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="gb2312" ?>
+<Font_file>
+	<Font genre="fantasy" ISBN="字库文件信息">
+		<ONOFF>0</ONOFF>
+		<filepath ISBN="字库地址">FontFile\SongTi_10_1212_gb2312.DZK</filepath>
+		<FileName ISBN="字库文件名">O000</FileName>
+		<FontWidth ISBN="字库宽度">12</FontWidth>
+		<FontHeight ISBN="字库高度">12</FontHeight>
+		<FontEncode ISBN="字库编码(AscII,GB2312,GBK,Unicode)">GB2312</FontEncode>
+	</Font>
+	<Font>
+		<ONOFF>0</ONOFF>
+		<filepath>FontFile\En_9_612.DZK</filepath>
+		<FileName>E000</FileName>
+		<FontWidth>6</FontWidth>
+		<FontHeight>12</FontHeight>
+		<FontEncode>AscII</FontEncode>
+	</Font>
+</Font_file>
