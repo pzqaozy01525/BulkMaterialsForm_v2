@@ -1,0 +1,14 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_ENCLOSURE_ALARM_TYPE_EX
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_ENCLOSURE_ALARM_TYPE_EX
+{
+	ENCLOSURE_ALARM_EX_UNKNOWN,
+	ENCLOSURE_ALARM_EX_DRIVEIN,
+	ENCLOSURE_ALARM_EX_DRIVEOUT,
+	ENCLOSURE_ALARM_EX_OVERSPEED,
+	ENCLOSURE_ALARM_EX_SPEEDCLEAR
+}

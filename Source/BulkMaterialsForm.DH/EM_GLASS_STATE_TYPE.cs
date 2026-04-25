@@ -1,0 +1,14 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_GLASS_STATE_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_GLASS_STATE_TYPE
+{
+	EM_GLASS_STATE_TYPE_UNKNOWN,
+	EM_GLASS_STATE_TYPE_NOT_WEARING,
+	EM_GLASS_STATE_TYPE_CONVENTIONAL_GLASSES,
+	EM_GLASS_STATE_TYPE_SUN_GLASSES,
+	EM_GLASS_STATE_TYPE_BLACK_GLASSES
+}

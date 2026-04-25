@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_A_NET_EM_LATTICE_SCREEN_SHOW_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_A_NET_EM_LATTICE_SCREEN_SHOW_TYPE
+{
+	EM_LATTICE_SCREEN_SHOW_TYPE_UNKNOWN = -1,
+	EM_LATTICE_SCREEN_SHOW_TYPE_WORD_CONTROL,
+	EM_LATTICE_SCREEN_SHOW_TYPE_TRUSTEESHIP_CONTROL
+}

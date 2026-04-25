@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_STARTFIND_DIRECTION
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_STARTFIND_DIRECTION
+{
+	EM_STARTFIND_DIRECTION_UNKNOWN,
+	EM_STARTFIND_DIRECTION_BOTH,
+	EM_STARTFIND_DIRECTION_LEFTTORIGHT,
+	EM_STARTFIND_DIRECTION_RIGHTTOLEFT
+}

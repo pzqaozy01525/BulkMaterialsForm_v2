@@ -1,0 +1,20 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_CFG_LC_MODE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_CFG_LC_MODE
+{
+	EM_CFG_LC_MODE_UNKNOWN,
+	EM_CFG_LC_MODE_MANUAL,
+	EM_CFG_LC_MODE_ZOOMPRIO,
+	EM_CFG_LC_MODE_TIMING,
+	EM_CFG_LC_MODE_AUTO,
+	EM_CFG_LC_MODE_OFF,
+	EM_CFG_LC_MODE_EXCLUSIVEMANUAL,
+	EM_CFG_LC_MODE_SMARTLIGHT,
+	EM_CFG_LC_MODE_LINKING,
+	EM_CFG_LC_MODE_DUSKTODAWN,
+	EM_CFG_LC_MODE_FORCEON
+}

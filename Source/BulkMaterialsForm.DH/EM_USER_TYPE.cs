@@ -1,0 +1,19 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_USER_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_USER_TYPE
+{
+	EM_USER_TYPE_UNKNOWN = -1,
+	EM_USER_TYPE_ORDINARY,
+	EM_USER_TYPE_BLACKLIST,
+	EM_USER_TYPE_VIP,
+	EM_USER_TYPE_GUEST,
+	EM_USER_TYPE_PATROL,
+	EM_USER_TYPE_DISABLED,
+	EM_USER_TYPE_FROZEN,
+	EM_USER_TYPE_LOGOUT,
+	EM_USER_TYPE_LOSSCARD
+}

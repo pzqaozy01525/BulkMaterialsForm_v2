@@ -1,0 +1,17 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_ESD_RESULT
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_ESD_RESULT
+{
+	EM_ESD_RESULT_UNKNOWN = -1,
+	EM_ESD_RESULT_OTHER_ABERRANT,
+	EM_ESD_RESULT_TEST_PASS,
+	EM_ESD_RESULT_HAND_TEST_FAIL,
+	EM_ESD_RESULT_LEFTFOOT_TEST_FAIL,
+	EM_ESD_RESULT_RIGHTFOOT_TEST_FAIL,
+	EM_ESD_RESULT_FOOT_TEST_FAIL,
+	EM_ESD_RESULT_TEST_FAIL
+}

@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_COAXIAL_CONTROL_IO_LIGHT_MODE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_COAXIAL_CONTROL_IO_LIGHT_MODE
+{
+	EM_COAXIAL_CONTROL_IO_LIGHT_MODE_UNKNOWN,
+	EM_COAXIAL_CONTROL_IO_LIGHT_MODE_BRIGHT,
+	EM_COAXIAL_CONTROL_IO_LIGHT_MODE_TWINKLE
+}

@@ -1,0 +1,47 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_CAR_COLOR_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_CAR_COLOR_TYPE
+{
+	WHITE = 0,
+	BLACK = 1,
+	RED = 2,
+	YELLOW = 3,
+	GRAY = 4,
+	BLUE = 5,
+	GREEN = 6,
+	PINK = 7,
+	PURPLE = 8,
+	DARK_PURPLE = 9,
+	BROWN = 10,
+	MAROON = 11,
+	SILVER_GRAY = 12,
+	DARK_GRAY = 13,
+	WHITE_SMOKE = 14,
+	DEEP_ORANGE = 15,
+	LIGHT_ROSE = 16,
+	TOMATO_RED = 17,
+	OLIVE = 18,
+	GOLDEN = 19,
+	DARK_OLIVE = 20,
+	YELLOW_GREEN = 21,
+	GREEN_YELLOW = 22,
+	FOREST_GREEN = 23,
+	OCEAN_BLUE = 24,
+	DEEP_SKYBLUE = 25,
+	CYAN = 26,
+	DEEP_BLUE = 27,
+	DEEP_RED = 28,
+	DEEP_GREEN = 29,
+	DEEP_YELLOW = 30,
+	DEEP_PINK = 31,
+	DEEP_PURPLE = 32,
+	DEEP_BROWN = 33,
+	DEEP_CYAN = 34,
+	ORANGE = 35,
+	DEEP_GOLDEN = 36,
+	OTHER = 255
+}

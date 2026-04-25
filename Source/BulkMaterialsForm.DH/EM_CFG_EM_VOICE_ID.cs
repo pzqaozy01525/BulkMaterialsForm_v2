@@ -1,0 +1,23 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_CFG_EM_VOICE_ID
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_CFG_EM_VOICE_ID
+{
+	UNKNOWN = -1,
+	VERIFY_SUCCESS,
+	OPENDOOR_SUCCESS,
+	UNLOCK_SUCCESS,
+	SWIPECARD_SUCCESS,
+	WELCOME,
+	WELCOME_BACK,
+	THANKS,
+	CUSTOMIZED_VOICE,
+	NO_VOICE,
+	WELCOME_HOME,
+	GOOD_JOURNEY,
+	WELCOME_BACK_NEXT,
+	THANKS_FOR_PATRONAGE
+}

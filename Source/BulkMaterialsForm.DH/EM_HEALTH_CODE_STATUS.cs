@@ -1,0 +1,15 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_HEALTH_CODE_STATUS
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_HEALTH_CODE_STATUS
+{
+	EM_HEALTH_CODE_STATUS_UNKNOWN,
+	EM_HEALTH_CODE_STATUS_RED,
+	EM_HEALTH_CODE_STATUS_GREEN,
+	EM_HEALTH_CODE_STATUS_YELLOW,
+	EM_HEALTH_CODE_STATUS_INVALID,
+	EM_HEALTH_CODE_STATUS_GREY
+}

@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.NET_EM_PARKING_SPACE_STATISTICS_MODE
+
+namespace BulkMaterialsForm.DH;
+
+public enum NET_EM_PARKING_SPACE_STATISTICS_MODE
+{
+	EM_PARKING_SPACE_STATISTICS_MODE_UNKNOWN,
+	EM_PARKING_SPACE_STATISTICS_MODE_AREA_MODE,
+	EM_PARKING_SPACE_STATISTICS_MODE_SPACE_MODE
+}

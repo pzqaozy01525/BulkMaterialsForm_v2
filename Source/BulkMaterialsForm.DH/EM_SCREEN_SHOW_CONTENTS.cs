@@ -1,0 +1,26 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_SCREEN_SHOW_CONTENTS
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_SCREEN_SHOW_CONTENTS
+{
+	UNKNOWN,
+	PLATENUMBER,
+	SYSTIME,
+	PARKTIME,
+	MASTEROFCAR,
+	USERTYPE,
+	REMAINDAY,
+	PARKCHARGE,
+	REMAINSPACE,
+	SYSDATE,
+	PASSICONCIRCLE,
+	PASSICONARROW,
+	INTIME,
+	OUTTIME,
+	REMARKS,
+	RESOURCE,
+	CUSTOM
+}

@@ -1,0 +1,16 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_ARM_STATE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_ARM_STATE
+{
+	EM_ARM_STATE_UNKNOWN,
+	EM_ARM_STATE_TOTAL_ARMING,
+	EM_ARM_STATE_PARTIAL1_ARMING,
+	EM_ARM_STATE_PARTIAL2_ARMING,
+	EM_ARM_STATE_PARTIAL1_PARTIAL2_ARMING,
+	EM_ARM_STATE_FORCEARMING,
+	EM_ARM_STATE_DISARMING
+}

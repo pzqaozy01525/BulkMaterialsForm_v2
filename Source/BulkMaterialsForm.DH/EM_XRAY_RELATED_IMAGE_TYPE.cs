@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_XRAY_RELATED_IMAGE_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_XRAY_RELATED_IMAGE_TYPE
+{
+	EM_XRAY_RELATED_IMAGE_TYPE_UNKNOWN = -1,
+	EM_XRAY_RELATED_IMAGE_TYPE_LARGE_FACE,
+	EM_XRAY_RELATED_IMAGE_TYPE_SMALL_FACE,
+	EM_XRAY_RELATED_IMAGE_TYPE_PACKAGE_VISIBLE_LIGHT
+}

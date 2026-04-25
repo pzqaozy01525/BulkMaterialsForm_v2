@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_ACCESSORY_SENSITIVITY
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_ACCESSORY_SENSITIVITY
+{
+	EM_ACCESSORY_SENSITIVITY_UNKNOWN,
+	EM_ACCESSORY_SENSITIVITY_LOW,
+	EM_ACCESSORY_SENSITIVITY_MEDIUM,
+	EM_ACCESSORY_SENSITIVITY_HIGH
+}

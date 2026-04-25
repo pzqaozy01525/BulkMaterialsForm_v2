@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_WATERDATA_STAT_SERVER_SUPPORT
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_WATERDATA_STAT_SERVER_SUPPORT
+{
+	EM_WATERDATA_STAT_SERVER_SUPPORT_UNKNOWN = -1,
+	EM_WATERDATA_STAT_SERVER_SUPPORT_NO,
+	EM_WATERDATA_STAT_SERVER_SUPPORT_YES
+}

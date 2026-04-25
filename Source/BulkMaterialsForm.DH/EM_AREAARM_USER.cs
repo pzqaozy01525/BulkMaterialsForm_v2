@@ -1,0 +1,17 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_AREAARM_USER
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_AREAARM_USER
+{
+	EM_AREAARM_USER_UNKNOWN,
+	EM_AREAARM_USER_SUPERVISOR,
+	EM_AREAARM_USER_MANAGER,
+	EM_AREAARM_USER_MASTER,
+	EM_AREAARM_USER_USER,
+	EM_AREAARM_USER_TEMPORARY,
+	EM_AREAARM_USER_DURESS,
+	EM_AREAARM_USER_PATROL
+}

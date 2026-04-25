@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_UPLOAD_PROCESS_STATUS
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_UPLOAD_PROCESS_STATUS
+{
+	EM_UPLOAD_PROCESS_STATUS_UPLOADING,
+	EM_UPLOAD_PROCESS_STATUS_COMPLETE,
+	EM_UPLOAD_PROCESS_STATUS_FAILED,
+	NET_UPLOAD_PROCESS_STATUS_CANCEL
+}

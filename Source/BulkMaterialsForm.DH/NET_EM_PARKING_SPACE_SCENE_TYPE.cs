@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.NET_EM_PARKING_SPACE_SCENE_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum NET_EM_PARKING_SPACE_SCENE_TYPE
+{
+	EM_PARKING_SPACE_SCENE_TYPE_UNKNOWN,
+	EM_PARKING_SPACE_SCENE_TYPE_PARKING_SPACE,
+	EM_PARKING_SPACE_SCENE_TYPE_PARKING_STATISTICS
+}

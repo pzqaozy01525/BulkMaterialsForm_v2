@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_DETECTOR_STATUS_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_DETECTOR_STATUS_TYPE
+{
+	EM_DETECTOR_STATUS_UNKNOWN = -1,
+	EM_DETECTOR_STATUS_ALLFUNCT_ENABLE,
+	EM_DETECTOR_STATUS_ANTITAMPER_DISABLE,
+	EM_DETECTOR_STATUS_ALLFUNCT_DISABLE
+}

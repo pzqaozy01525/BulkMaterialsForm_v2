@@ -1,0 +1,39 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_OBJECT_COLOR_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_OBJECT_COLOR_TYPE
+{
+	UNKNOWN,
+	WHITE,
+	ORANGE,
+	PINK,
+	BLACK,
+	RED,
+	YELLOW,
+	GRAY,
+	BLUE,
+	GREEN,
+	PURPLE,
+	BROWN,
+	SLIVER,
+	DARKVIOLET,
+	MAROON,
+	DIMGRAY,
+	WHITESMOKE,
+	DARKORANGE,
+	MISTYROSE,
+	TOMATO,
+	OLIVE,
+	GOLD,
+	DARKOLIVEGREEN,
+	CHARTREUSE,
+	GREENYELLOW,
+	FORESTGREEN,
+	SEAGREEN,
+	DEEPSKYBLUE,
+	CYAN,
+	OTHER
+}

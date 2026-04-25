@@ -1,0 +1,17 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_VIDEO_STREAM
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_VIDEO_STREAM
+{
+	EM_VIDEO_STREAM_UNKNOWN,
+	EM_VIDEO_STREAM_MAIN,
+	EM_VIDEO_STREAM_EXTRA1,
+	EM_VIDEO_STREAM_EXTRA2,
+	EM_VIDEO_STREAM_EXTRA3,
+	EM_VIDEO_STREAM_AUTO,
+	EM_VIDEO_STREAM_PREVIEW,
+	EM_VIDEO_STREAM_NO_VIDEO_JUST_AUDIO
+}

@@ -1,0 +1,14 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_PLATE_ATTRIBUTE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_PLATE_ATTRIBUTE
+{
+	EM_PLATE_ATTRIBUTE_UNKNOWN,
+	EM_PLATE_ATTRIBUTE_NORMAL,
+	EM_PLATE_ATTRIBUTE_NO_PLATE,
+	EM_PLATE_ATTRIBUTE_PARTIAL_OCCLUSION,
+	EM_PLATE_ATTRIBUTE_FULL_OCCLUSION
+}

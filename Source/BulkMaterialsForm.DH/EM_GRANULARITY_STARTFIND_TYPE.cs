@@ -1,0 +1,14 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_GRANULARITY_STARTFIND_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_GRANULARITY_STARTFIND_TYPE
+{
+	EM_GRANULARITY_TYPE_UNKNOWN,
+	EM_GRANULARITY_TYPE_MINUTE,
+	EM_GRANULARITY_TYPE_HOUR,
+	EM_GRANULARITY_TYPE_DAY,
+	EM_GRANULARITY_TYPE_MONTH
+}

@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_TRANSMIT_ENCRYPT_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_TRANSMIT_ENCRYPT_TYPE
+{
+	EM_TRANSMIT_ENCRYPT_TYPE_UNKNOWN = -1,
+	EM_TRANSMIT_ENCRYPT_TYPE_NORMAL,
+	EM_TRANSMIT_ENCRYPT_TYPE_MULTISEC,
+	EM_TRANSMIT_ENCRYPT_TYPE_BINARYSEC
+}

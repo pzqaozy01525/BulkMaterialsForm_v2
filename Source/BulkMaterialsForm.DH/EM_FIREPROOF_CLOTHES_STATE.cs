@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_FIREPROOF_CLOTHES_STATE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_FIREPROOF_CLOTHES_STATE
+{
+	EM_FIREPROOF_CLOTHES_STATE_UNKNOWN,
+	EM_FIREPROOF_CLOTHES_STATE_NO,
+	EM_FIREPROOF_CLOTHES_STATE_YES,
+	EM_FIREPROOF_CLOTHES_STATE_NOEXIT
+}

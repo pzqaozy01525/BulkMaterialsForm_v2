@@ -1,0 +1,44 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_CARD_PROVINCE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_CARD_PROVINCE
+{
+	UNKNOWN = 10,
+	BEIJING = 11,
+	TIANJIN = 12,
+	HEBEI = 13,
+	SHANXI_TAIYUAN = 14,
+	NEIMENGGU = 15,
+	LIAONING = 21,
+	JILIN = 22,
+	HEILONGJIANG = 23,
+	SHANGHAI = 31,
+	JIANGSU = 32,
+	ZHEJIANG = 33,
+	ANHUI = 34,
+	FUJIAN = 35,
+	JIANGXI = 36,
+	SHANDONG = 37,
+	HENAN = 41,
+	HUBEI = 42,
+	HUNAN = 43,
+	GUANGDONG = 44,
+	GUANGXI = 45,
+	HAINAN = 46,
+	CHONGQING = 50,
+	SICHUAN = 51,
+	GUIZHOU = 52,
+	YUNNAN = 53,
+	XIZANG = 54,
+	SHANXI_XIAN = 61,
+	GANSU = 62,
+	QINGHAI = 63,
+	NINGXIA = 64,
+	XINJIANG = 65,
+	XIANGGANG = 71,
+	AOMEN = 82,
+	TAIWAN = 83
+}

@@ -1,0 +1,24 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_USEDEV_MODE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_USEDEV_MODE
+{
+	TALK_CLIENT_MODE = 0,
+	TALK_SERVER_MODE = 1,
+	TALK_ENCODE_TYPE = 2,
+	ALARM_LISTEN_MODE = 3,
+	CONFIG_AUTHORITY_MODE = 4,
+	TALK_TALK_CHANNEL = 5,
+	RECORD_STREAM_TYPE = 6,
+	TALK_SPEAK_PARAM = 7,
+	RECORD_TYPE = 8,
+	TALK_MODE3 = 9,
+	PLAYBACK_REALTIME_MODE = 10,
+	TALK_TRANSFER_MODE = 11,
+	TALK_VT_PARAM = 12,
+	TARGET_DEV_ID = 13,
+	AUDIO_RECORD_LENGTH = 15
+}

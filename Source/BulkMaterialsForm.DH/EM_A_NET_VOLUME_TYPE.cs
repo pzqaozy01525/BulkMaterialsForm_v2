@@ -1,0 +1,19 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_A_NET_VOLUME_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_A_NET_VOLUME_TYPE
+{
+	VOLUME_TYPE_ALL,
+	VOLUME_TYPE_PHYSICAL,
+	VOLUME_TYPE_RAID,
+	VOLUME_TYPE_VOLUME_GROUP,
+	VOLUME_TYPE_ISCSI,
+	VOLUME_TYPE_INVIDUAL_PHY,
+	VOLUME_TYPE_GLOBAL_SPARE,
+	VOLUME_TYPE_NAS,
+	VOLUME_TYPE_INVIDUAL_RAID,
+	VOLUME_TYPE_MAX
+}

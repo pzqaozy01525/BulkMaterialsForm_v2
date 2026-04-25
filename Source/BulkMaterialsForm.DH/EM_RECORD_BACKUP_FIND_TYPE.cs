@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_RECORD_BACKUP_FIND_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_RECORD_BACKUP_FIND_TYPE
+{
+	EM_RECORD_BACKUP_FIND_TYPE_UNKNOWN,
+	EM_RECORD_BACKUP_FIND_TYPE_BY_TASKID,
+	EM_RECORD_BACKUP_FIND_TYPE_BY_CHN_AND_TIME,
+	EM_RECORD_BACKUP_FIND_TYPE_BY_DEVICE_ID
+}

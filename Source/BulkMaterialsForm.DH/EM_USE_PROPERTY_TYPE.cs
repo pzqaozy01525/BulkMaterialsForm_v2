@@ -1,0 +1,28 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_USE_PROPERTY_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_USE_PROPERTY_TYPE
+{
+	OTHER,
+	NOTOPERATING,
+	HIGWAY,
+	BUS,
+	TAXI,
+	TOURISM,
+	FREIGHT,
+	LEASE,
+	POLICE,
+	FIRE,
+	RESCUE,
+	ENGINEERING,
+	OPERATION_TO_NOT,
+	TAXI_TO_NOT,
+	COACH,
+	KINDER_SCHOOLBUS,
+	PUPIL_SCHOOLBUS,
+	OTHER_SCHOOLBUS,
+	FOR_DANGE_VEHICLE
+}

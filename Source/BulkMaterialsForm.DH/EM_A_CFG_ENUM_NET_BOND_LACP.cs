@@ -1,0 +1,15 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_A_CFG_ENUM_NET_BOND_LACP
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_A_CFG_ENUM_NET_BOND_LACP
+{
+	CFG_ENUM_NET_BOND_LACP_UNKNOWN,
+	CFG_ENUM_NET_BOND_LACP_MAC,
+	CFG_ENUM_NET_BOND_LACP_IPPORT,
+	CFG_ENUM_NET_BOND_LACP_IPMAC,
+	CFG_ENUM_NET_BOND_LACP_IP,
+	CFG_ENUM_NET_BOND_LACP_PORT
+}

@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_PASSENGER_CARD_CHECK_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_PASSENGER_CARD_CHECK_TYPE
+{
+	EM_PASSENGER_CARD_CHECK_TYPE_UNKOWN,
+	EM_PASSENGER_CARD_CHECK_TYPE_SIGNIN,
+	EM_PASSENGER_CARD_CHECK_TYPE_SIGNOUT,
+	EM_PASSENGER_CARD_CHECK_TYPE_NORMAL
+}

@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_DEPOSIT_DETECTION_SCENE_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_DEPOSIT_DETECTION_SCENE_TYPE
+{
+	EM_DEPOSIT_DETECTION_SCENE_TYPE_UNKNOWN = -1,
+	EM_DEPOSIT_DETECTION_SCENE_TYPE_LATTICE,
+	EM_DEPOSIT_DETECTION_SCENE_TYPE_CONVEROR_BELT
+}

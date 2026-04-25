@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_DATA_CALL_BACK_FRAM_SUB_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_DATA_CALL_BACK_FRAM_SUB_TYPE
+{
+	EM_DATA_CALL_BACK_FRAM_SUB_TYPE_INVALID = -1,
+	EM_DATA_CALL_BACK_FRAM_SUB_TYPE_I_FRAME,
+	EM_DATA_CALL_BACK_FRAM_SUB_TYPE_P_FRAME,
+	EM_DATA_CALL_BACK_FRAM_SUB_TYPE_B_FRAME
+}

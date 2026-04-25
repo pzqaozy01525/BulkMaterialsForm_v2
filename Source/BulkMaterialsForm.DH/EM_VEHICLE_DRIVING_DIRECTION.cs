@@ -1,0 +1,12 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_VEHICLE_DRIVING_DIRECTION
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_VEHICLE_DRIVING_DIRECTION
+{
+	EM_VEHICLE_DRIVING_DIRECTION_UNKNOWN,
+	EM_VEHICLE_DRIVING_DIRECTION_OBVERSE,
+	EM_VEHICLE_DRIVING_DIRECTION_REVERSE
+}

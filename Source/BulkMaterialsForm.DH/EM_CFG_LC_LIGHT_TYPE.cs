@@ -1,0 +1,15 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_CFG_LC_LIGHT_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_CFG_LC_LIGHT_TYPE
+{
+	EM_CFG_LC_LIGHT_TYPEUNKNOWN,
+	EM_CFG_LC_LIGHT_TYPE_INFRAREDLIGHT,
+	EM_CFG_LC_LIGHT_TYPE_WIHTELIGHT,
+	EM_CFG_LC_LIGHT_TYPE_LASERLIGHT,
+	EM_CFG_LC_LIGHT_TYPE_AIMIXLIGHT,
+	EM_CFG_LC_LIGHT_TYPE_PILOTLIGHT
+}

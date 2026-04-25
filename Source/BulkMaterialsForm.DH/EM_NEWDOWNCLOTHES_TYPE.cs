@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_NEWDOWNCLOTHES_TYPE
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_NEWDOWNCLOTHES_TYPE
+{
+	EM_NEWDOWNCLOTHES_TYPE_UNKNOWN,
+	EM_NEWDOWNCLOTHES_TYPE_TROUSERS,
+	EM_NEWDOWNCLOTHES_TYPE_SHORTS,
+	EM_NEWDOWNCLOTHES_TYPE_SKIRT
+}

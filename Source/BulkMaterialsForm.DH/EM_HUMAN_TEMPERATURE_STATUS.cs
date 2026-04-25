@@ -1,0 +1,13 @@
+// Decompiled from: BulkMaterialsForm.exe
+// Namespace: BulkMaterialsForm.DH
+// Type: BulkMaterialsForm.DH.EM_HUMAN_TEMPERATURE_STATUS
+
+namespace BulkMaterialsForm.DH;
+
+public enum EM_HUMAN_TEMPERATURE_STATUS
+{
+	EM_HUMAN_TEMPERATURE_STATUS_UNKNOWN = -1,
+	EM_HUMAN_TEMPERATURE_STATUS_LOW,
+	EM_HUMAN_TEMPERATURE_STATUS_NORMAL,
+	EM_HUMAN_TEMPERATURE_STATUS_HIGH
+}
