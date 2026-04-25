@@ -269,7 +269,7 @@ public class FDLRecordForm : Form
 			dataGridView1.DataSource = list2;
 			dataGridView1.Columns["hbdjh"].HeaderText = "环保登记号";
 			dataGridView1.Columns["jxscrq"].HeaderText = "机械生产日期";
-			dataGridView1.Columns["car_no"].HeaderText = "车牌编号";
+			dataGridView1.Columns["car_no"].HeaderText = "车牌号";
 			dataGridView1.Columns["pfjd"].HeaderText = "排放阶段";
 			dataGridView1.Columns["ryxl"].HeaderText = "燃油类型";
 			dataGridView1.Columns["jxzl"].HeaderText = "机械种类";
@@ -452,8 +452,8 @@ public class FDLRecordForm : Form
 		this.tableLayoutPanel2.Size = new System.Drawing.Size(1380, 89);
 		this.tableLayoutPanel2.TabIndex = 2;
 		this.dateEnd.Anchor = System.Windows.Forms.AnchorStyles.None;
-		this.dateEnd.CalendarFont = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-		this.dateEnd.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateEnd.CalendarFont = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateEnd.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.dateEnd.Location = new System.Drawing.Point(588, 49);
 		this.dateEnd.Name = "dateEnd";
 		this.dateEnd.Size = new System.Drawing.Size(203, 34);
@@ -461,7 +461,7 @@ public class FDLRecordForm : Form
 		this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label2.AutoSize = true;
 		this.label2.BackColor = System.Drawing.Color.Transparent;
-		this.label2.Font = new System.Drawing.Font("微软雅黑", 12f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.label2.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.label2.ForeColor = System.Drawing.Color.Black;
 		this.label2.Location = new System.Drawing.Point(61, 11);
 		this.label2.Name = "label2";
@@ -471,7 +471,7 @@ public class FDLRecordForm : Form
 		this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label4.AutoSize = true;
 		this.label4.BackColor = System.Drawing.Color.Transparent;
-		this.label4.Font = new System.Drawing.Font("微软雅黑", 12f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.label4.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.label4.ForeColor = System.Drawing.Color.Black;
 		this.label4.Location = new System.Drawing.Point(459, 56);
 		this.label4.Name = "label4";
@@ -479,7 +479,7 @@ public class FDLRecordForm : Form
 		this.label4.TabIndex = 44;
 		this.label4.Text = "结束时间：";
 		this.textBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
-		this.textBox1.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.textBox1.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.textBox1.Location = new System.Drawing.Point(174, 5);
 		this.textBox1.Name = "textBox1";
 		this.textBox1.Size = new System.Drawing.Size(203, 34);
@@ -487,7 +487,7 @@ public class FDLRecordForm : Form
 		this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label1.AutoSize = true;
 		this.label1.BackColor = System.Drawing.Color.Transparent;
-		this.label1.Font = new System.Drawing.Font("微软雅黑", 12f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.label1.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.label1.ForeColor = System.Drawing.Color.Black;
 		this.label1.Location = new System.Drawing.Point(459, 11);
 		this.label1.Name = "label1";
@@ -497,7 +497,7 @@ public class FDLRecordForm : Form
 		this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label3.AutoSize = true;
 		this.label3.BackColor = System.Drawing.Color.Transparent;
-		this.label3.Font = new System.Drawing.Font("微软雅黑", 12f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.label3.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.label3.ForeColor = System.Drawing.Color.Black;
 		this.label3.Location = new System.Drawing.Point(45, 56);
 		this.label3.Name = "label3";
@@ -505,14 +505,14 @@ public class FDLRecordForm : Form
 		this.label3.TabIndex = 42;
 		this.label3.Text = "开始时间：";
 		this.dateStart.Anchor = System.Windows.Forms.AnchorStyles.None;
-		this.dateStart.CalendarFont = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-		this.dateStart.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateStart.CalendarFont = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateStart.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.dateStart.Location = new System.Drawing.Point(174, 49);
 		this.dateStart.Name = "dateStart";
 		this.dateStart.Size = new System.Drawing.Size(203, 34);
 		this.dateStart.TabIndex = 43;
 		this.comboBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
-		this.comboBox1.Font = new System.Drawing.Font("微软雅黑", 15f);
+		this.comboBox1.Font = new System.Drawing.Font("微软雅黑", 9f);
 		this.comboBox1.FormattingEnabled = true;
 		this.comboBox1.Items.AddRange(new object[3] { "全部", "入口", "出口" });
 		this.comboBox1.Location = new System.Drawing.Point(588, 4);

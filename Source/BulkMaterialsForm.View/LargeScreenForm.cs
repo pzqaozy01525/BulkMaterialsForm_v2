@@ -40,6 +40,8 @@ public class LargeScreenForm : Form
 
 	private DataGridView dataGridView1;
 
+	private Label labelEmpty;
+
 	public LargeScreenForm()
 	{
 		InitializeComponent();
@@ -119,15 +121,16 @@ public class LargeScreenForm : Form
 		if (list != null)
 		{
 			dataGridView1.DataSource = list;
-			dataGridView1.Columns["IP"].HeaderText = "IP";
+			dataGridView1.Columns["IP"].HeaderText = "IP地址";
 			dataGridView1.Columns["largeName"].HeaderText = "大屏名称";
-			dataGridView1.Columns["largeWidth"].HeaderText = "大屏宽";
-			dataGridView1.Columns["largeHeight"].HeaderText = "大屏高";
+			dataGridView1.Columns["largeWidth"].HeaderText = "大屏宽度";
+			dataGridView1.Columns["largeHeight"].HeaderText = "大屏高度";
 			dataGridView1.Columns["id"].Visible = false;
+			labelEmpty.Visible = list.Count == 0;
 		}
 		else
 		{
-			dataGridView1.DataSource = null;
+			labelEmpty.Visible = true;
 		}
 	}
 
@@ -231,6 +234,18 @@ public class LargeScreenForm : Form
 		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 12f);
 		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 		base.ClientSize = new System.Drawing.Size(904, 559);
+		this.labelEmpty = new System.Windows.Forms.Label();
+		this.labelEmpty.Dock = System.Windows.Forms.DockStyle.Fill;
+		this.labelEmpty.Font = new System.Drawing.Font("微软雅黑", 9f);
+		this.labelEmpty.ForeColor = System.Drawing.Color.Gray;
+		this.labelEmpty.Location = new System.Drawing.Point(0, 40);
+		this.labelEmpty.Name = "labelEmpty";
+		this.labelEmpty.Size = new System.Drawing.Size(904, 519);
+		this.labelEmpty.TabIndex = 6;
+		this.labelEmpty.Text = "暂无数据，请先新增记录";
+		this.labelEmpty.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+		this.labelEmpty.Visible = false;
+		base.Controls.Add(this.labelEmpty);
 		base.Controls.Add(this.dataGridView1);
 		base.Controls.Add(this.barDockControlLeft);
 		base.Controls.Add(this.barDockControl1);

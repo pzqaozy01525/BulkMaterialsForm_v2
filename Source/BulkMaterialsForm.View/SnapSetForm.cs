@@ -266,9 +266,9 @@ public class SnapSetForm : Form
 		this.label8.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
 		this.label8.Location = new System.Drawing.Point(83, 128);
 		this.label8.Name = "label8";
-		this.label8.Size = new System.Drawing.Size(32, 27);
+		this.label8.Size = new System.Drawing.Size(68, 17);
 		this.label8.TabIndex = 41;
-		this.label8.Text = "IP";
+		this.label8.Text = "IP *";
 		this.textBox2.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.textBox2.Location = new System.Drawing.Point(141, 176);
 		this.textBox2.Name = "textBox2";
@@ -279,9 +279,9 @@ public class SnapSetForm : Form
 		this.label1.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
 		this.label1.Location = new System.Drawing.Point(83, 179);
 		this.label1.Name = "label1";
-		this.label1.Size = new System.Drawing.Size(52, 27);
+		this.label1.Size = new System.Drawing.Size(56, 17);
 		this.label1.TabIndex = 43;
-		this.label1.Text = "账号";
+		this.label1.Text = "账号 *";
 		this.textBox3.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.textBox3.Location = new System.Drawing.Point(141, 236);
 		this.textBox3.Name = "textBox3";
@@ -292,9 +292,9 @@ public class SnapSetForm : Form
 		this.label2.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
 		this.label2.Location = new System.Drawing.Point(83, 239);
 		this.label2.Name = "label2";
-		this.label2.Size = new System.Drawing.Size(52, 27);
+		this.label2.Size = new System.Drawing.Size(56, 17);
 		this.label2.TabIndex = 45;
-		this.label2.Text = "密码";
+		this.label2.Text = "密码 *";
 		this.barManager1.Bars.AddRange(new DevExpress.XtraBars.Bar[1] { this.bar2 });
 		this.barManager1.DockControls.Add(this.barDockControlTop);
 		this.barManager1.DockControls.Add(this.barDockControlBottom);

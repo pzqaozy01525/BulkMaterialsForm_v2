@@ -47,7 +47,7 @@ public class ChartForm : Form
 	{
 		Title title = new Title();
 		title.Text = "进出车辆汇总数据";
-		title.Font = new Font("微软雅黑", 16f, FontStyle.Bold);
+		title.Font = new Font("微软雅黑", 14f, FontStyle.Bold);
 		title.ForeColor = Color.DarkBlue;
 		title.Alignment = ContentAlignment.TopCenter;
 		chart1.Titles.Add(title);
@@ -266,15 +266,15 @@ public class ChartForm : Form
 		this.button1.Text = "查询";
 		this.button1.UseVisualStyleBackColor = true;
 		this.button1.Click += new System.EventHandler(button1_Click);
-		this.dateEnd.CalendarFont = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-		this.dateEnd.Font = new System.Drawing.Font("微软雅黑", 12f);
+		this.dateEnd.CalendarFont = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateEnd.Font = new System.Drawing.Font("微软雅黑", 9f);
 		this.dateEnd.Location = new System.Drawing.Point(483, 12);
 		this.dateEnd.Name = "dateEnd";
 		this.dateEnd.Size = new System.Drawing.Size(251, 29);
 		this.dateEnd.TabIndex = 49;
 		this.label4.AutoSize = true;
 		this.label4.BackColor = System.Drawing.Color.Transparent;
-		this.label4.Font = new System.Drawing.Font("微软雅黑", 12f);
+		this.label4.Font = new System.Drawing.Font("微软雅黑", 9f);
 		this.label4.ForeColor = System.Drawing.Color.Black;
 		this.label4.Location = new System.Drawing.Point(387, 16);
 		this.label4.Name = "label4";
@@ -283,15 +283,15 @@ public class ChartForm : Form
 		this.label4.Text = "结束时间：";
 		this.label3.AutoSize = true;
 		this.label3.BackColor = System.Drawing.Color.Transparent;
-		this.label3.Font = new System.Drawing.Font("微软雅黑", 12f);
+		this.label3.Font = new System.Drawing.Font("微软雅黑", 9f);
 		this.label3.ForeColor = System.Drawing.Color.Black;
 		this.label3.Location = new System.Drawing.Point(3, 16);
 		this.label3.Name = "label3";
 		this.label3.Size = new System.Drawing.Size(90, 21);
 		this.label3.TabIndex = 46;
 		this.label3.Text = "开始时间：";
-		this.dateStart.CalendarFont = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-		this.dateStart.Font = new System.Drawing.Font("微软雅黑", 12f);
+		this.dateStart.CalendarFont = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateStart.Font = new System.Drawing.Font("微软雅黑", 9f);
 		this.dateStart.Location = new System.Drawing.Point(98, 12);
 		this.dateStart.Name = "dateStart";
 		this.dateStart.Size = new System.Drawing.Size(251, 29);

@@ -40,6 +40,8 @@ public class ChannelForm : Form
 
 	private DataGridView dataGridView1;
 
+	private Label labelEmpty;
+
 	public ChannelForm()
 	{
 		InitializeComponent();
@@ -61,6 +63,11 @@ public class ChannelForm : Form
 			dataGridView1.Columns["ChannelType"].HeaderText = "通道类型";
 			dataGridView1.Columns["ChannelPort"].HeaderText = "API端口";
 			dataGridView1.Columns["id"].Visible = false;
+			labelEmpty.Visible = list.Count == 0;
+		}
+		else
+		{
+			labelEmpty.Visible = true;
 		}
 	}
 
@@ -229,9 +236,21 @@ public class ChannelForm : Form
 		this.dataGridView1.Size = new System.Drawing.Size(847, 444);
 		this.dataGridView1.TabIndex = 5;
 		this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellClick);
+		this.labelEmpty = new System.Windows.Forms.Label();
+		this.labelEmpty.Dock = System.Windows.Forms.DockStyle.Fill;
+		this.labelEmpty.Font = new System.Drawing.Font("微软雅黑", 9f);
+		this.labelEmpty.ForeColor = System.Drawing.Color.Gray;
+		this.labelEmpty.Location = new System.Drawing.Point(0, 40);
+		this.labelEmpty.Name = "labelEmpty";
+		this.labelEmpty.Size = new System.Drawing.Size(847, 444);
+		this.labelEmpty.TabIndex = 6;
+		this.labelEmpty.Text = "暂无数据，请先新增记录";
+		this.labelEmpty.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+		this.labelEmpty.Visible = false;
 		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 12f);
 		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 		base.ClientSize = new System.Drawing.Size(847, 484);
+		base.Controls.Add(this.labelEmpty);
 		base.Controls.Add(this.dataGridView1);
 		base.Controls.Add(this.barDockControlLeft);
 		base.Controls.Add(this.barDockControl1);

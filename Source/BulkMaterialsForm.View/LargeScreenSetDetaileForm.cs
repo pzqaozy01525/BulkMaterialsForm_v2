@@ -520,7 +520,7 @@ public class LargeScreenSetDetaileForm : Form
 		this.label11.TabIndex = 61;
 		this.label11.Text = "字体颜色";
 		this.comboBox2.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-		this.comboBox2.Font = new System.Drawing.Font("微软雅黑", 12f);
+		this.comboBox2.Font = new System.Drawing.Font("微软雅黑", 9f);
 		this.comboBox2.FormattingEnabled = true;
 		this.comboBox2.Items.AddRange(new object[3] { "红色", "绿色", "黄色" });
 		this.comboBox2.Location = new System.Drawing.Point(170, 370);

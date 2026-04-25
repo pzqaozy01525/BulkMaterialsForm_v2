@@ -260,7 +260,7 @@ public class thirdPartytForm : Form
 		this.barDockControl1.Size = new System.Drawing.Size(0, 373);
 		this.tabControl1.Controls.Add(this.tabPage1);
 		this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-		this.tabControl1.Font = new System.Drawing.Font("微软雅黑", 12f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.tabControl1.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.tabControl1.Location = new System.Drawing.Point(0, 40);
 		this.tabControl1.Name = "tabControl1";
 		this.tabControl1.SelectedIndex = 0;
@@ -296,7 +296,7 @@ public class thirdPartytForm : Form
 		this.label7.AutoSize = true;
 		this.label7.Location = new System.Drawing.Point(548, 31);
 		this.label7.Name = "label7";
-		this.label7.Size = new System.Drawing.Size(74, 21);
+		this.label7.Size = new System.Drawing.Size(56, 17);
 		this.label7.TabIndex = 14;
 		this.label7.Text = "推送人：";
 		this.textBox5.Location = new System.Drawing.Point(416, 28);
@@ -307,7 +307,7 @@ public class thirdPartytForm : Form
 		this.label6.AutoSize = true;
 		this.label6.Location = new System.Drawing.Point(352, 31);
 		this.label6.Name = "label6";
-		this.label6.Size = new System.Drawing.Size(58, 21);
+		this.label6.Size = new System.Drawing.Size(42, 17);
 		this.label6.TabIndex = 12;
 		this.label6.Text = "纬度：";
 		this.textBox4.Location = new System.Drawing.Point(198, 26);
@@ -318,14 +318,14 @@ public class thirdPartytForm : Form
 		this.label5.AutoSize = true;
 		this.label5.Location = new System.Drawing.Point(134, 29);
 		this.label5.Name = "label5";
-		this.label5.Size = new System.Drawing.Size(58, 21);
+		this.label5.Size = new System.Drawing.Size(42, 17);
 		this.label5.TabIndex = 10;
 		this.label5.Text = "经度：";
 		this.label4.AutoSize = true;
 		this.label4.ForeColor = System.Drawing.Color.Red;
 		this.label4.Location = new System.Drawing.Point(390, 232);
 		this.label4.Name = "label4";
-		this.label4.Size = new System.Drawing.Size(378, 21);
+		this.label4.Size = new System.Drawing.Size(294, 17);
 		this.label4.TabIndex = 9;
 		this.label4.Text = "通道呢里录入完毕以后再点击这里的推送通道信息！\r\n";
 		this.button2.Location = new System.Drawing.Point(456, 265);
@@ -349,7 +349,7 @@ public class thirdPartytForm : Form
 		this.label3.AutoSize = true;
 		this.label3.Location = new System.Drawing.Point(20, 190);
 		this.label3.Name = "label3";
-		this.label3.Size = new System.Drawing.Size(102, 21);
+		this.label3.Size = new System.Drawing.Size(84, 17);
 		this.label3.TabIndex = 5;
 		this.label3.Text = "appSecret：";
 		this.textBox2.Location = new System.Drawing.Point(133, 133);
@@ -359,7 +359,7 @@ public class thirdPartytForm : Form
 		this.label2.AutoSize = true;
 		this.label2.Location = new System.Drawing.Point(37, 136);
 		this.label2.Name = "label2";
-		this.label2.Size = new System.Drawing.Size(82, 21);
+		this.label2.Size = new System.Drawing.Size(56, 17);
 		this.label2.TabIndex = 3;
 		this.label2.Text = "appKey：";
 		this.textBox1.Location = new System.Drawing.Point(133, 79);
@@ -369,7 +369,7 @@ public class thirdPartytForm : Form
 		this.label1.AutoSize = true;
 		this.label1.Location = new System.Drawing.Point(37, 82);
 		this.label1.Name = "label1";
-		this.label1.Size = new System.Drawing.Size(90, 21);
+		this.label1.Size = new System.Drawing.Size(70, 17);
 		this.label1.TabIndex = 1;
 		this.label1.Text = "服务地址：";
 		this.checkBox1.AutoSize = true;

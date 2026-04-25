@@ -225,7 +225,7 @@ public class exeRecordForm : Form
 				dataGridView1.Columns["gateName"].HeaderText = "设备名称";
 				dataGridView1.Columns["ChannelType"].HeaderText = "进出方向";
 				dataGridView1.Columns["car_no"].HeaderText = "车牌号";
-				dataGridView1.Columns["OpeningType"].HeaderText = "警报操作";
+				dataGridView1.Columns["OpeningType"].HeaderText = "操作类型";
 				dataGridView1.Columns["SnapImagePath1"].HeaderText = "抓怕图片";
 				dataGridView1.Columns["SnapImagePath2"].HeaderText = "抓怕图片";
 				dataGridView1.Columns["SnapImagePath3"].HeaderText = "抓怕图片";
@@ -580,7 +580,7 @@ public class exeRecordForm : Form
 		this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label3.AutoSize = true;
 		this.label3.BackColor = System.Drawing.Color.Transparent;
-		this.label3.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.label3.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
 		this.label3.ForeColor = System.Drawing.Color.Black;
 		this.label3.Location = new System.Drawing.Point(18, 18);
 		this.label3.Name = "label3";
@@ -588,8 +588,8 @@ public class exeRecordForm : Form
 		this.label3.TabIndex = 42;
 		this.label3.Text = "开始时间：";
 		this.dateStart.Anchor = System.Windows.Forms.AnchorStyles.None;
-		this.dateStart.CalendarFont = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-		this.dateStart.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateStart.CalendarFont = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateStart.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.dateStart.Location = new System.Drawing.Point(140, 15);
 		this.dateStart.Name = "dateStart";
 		this.dateStart.Size = new System.Drawing.Size(251, 34);
@@ -597,7 +597,7 @@ public class exeRecordForm : Form
 		this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label4.AutoSize = true;
 		this.label4.BackColor = System.Drawing.Color.Transparent;
-		this.label4.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.label4.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
 		this.label4.ForeColor = System.Drawing.Color.Black;
 		this.label4.Location = new System.Drawing.Point(417, 18);
 		this.label4.Name = "label4";
@@ -605,8 +605,8 @@ public class exeRecordForm : Form
 		this.label4.TabIndex = 44;
 		this.label4.Text = "结束时间：";
 		this.dateEnd.Anchor = System.Windows.Forms.AnchorStyles.None;
-		this.dateEnd.CalendarFont = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-		this.dateEnd.Font = new System.Drawing.Font("微软雅黑", 15f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateEnd.CalendarFont = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+		this.dateEnd.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.dateEnd.Location = new System.Drawing.Point(539, 15);
 		this.dateEnd.Name = "dateEnd";
 		this.dateEnd.Size = new System.Drawing.Size(251, 34);
@@ -733,7 +733,7 @@ public class exeRecordForm : Form
 		base.Controls.Add(this.barDockControl2);
 		base.Name = "exeRecordForm";
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "道闸抬杆记录";
+		this.Text = "通行记录";
 		((System.ComponentModel.ISupportInitialize)this.barManager1).EndInit();
 		this.tableLayoutPanel1.ResumeLayout(false);
 		((System.ComponentModel.ISupportInitialize)this.dataGridView1).EndInit();
