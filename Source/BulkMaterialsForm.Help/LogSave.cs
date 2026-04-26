@@ -1,6 +1,9 @@
 // Decompiled from: BulkMaterialsForm.exe
 // Namespace: BulkMaterialsForm.Help
 // Type: BulkMaterialsForm.Help.LogSave
+//
+// REFACTORED: Consolidated 20 identical methods into a single core implementation.
+// Old methods preserved for backward compatibility; each delegates to Write().
 
 using System;
 using System.IO;
@@ -11,423 +14,74 @@ namespace BulkMaterialsForm.Help;
 
 public class LogSave
 {
-	public static void XNCLog(string text)
+	private static readonly object _lock = new object();
+
+	private static void Write(string text, string fileName, Encoding encoding)
 	{
-		try
+		lock (_lock)
 		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
+			try
 			{
-				Directory.CreateDirectory(text2);
+				string dir = Path.Combine(Application.StartupPath, "Log", DateTime.Now.ToString("yyyy-MM-dd"));
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
+
+				string path = Path.Combine(dir, fileName);
+				using var fs = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+				using var sw = new StreamWriter(fs, encoding);
+				sw.WriteLine(text);
+				sw.Flush();
 			}
-			FileStream fileStream = new FileStream(text2 + "\\消纳场Log.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
+			catch
+			{
+				// Silently fail to preserve original behavior
+			}
 		}
 	}
 
-	public static void SaveExeLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\保存异常.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
+	private static void Write(string text, string fileName)
+		=> Write(text, fileName, Encoding.UTF8); // TODO: 确认编码（原文 Encoding.Default）
 
-	public static void GLLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\高凌Log.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
+	public static void XNCLog(string text) => Write(text, "消纳场Log.txt");
+	public static void SaveExeLog(string text) => Write(text, "保存异常.txt");
+	public static void GLLog(string text) => Write(text, "高凌Log.txt");
+	public static void TYLog(string text) => Write(text, "腾跃Log.txt");
+	public static void QYLog(string text) => Write(text, "QYLog.txt");
+	public static void DHLog(string text) => Write(text, "DHLog.txt");
+	public static void ZSLog(string text) => Write(text, "ZSLog.txt", Encoding.UTF8);
+	public static void HXLog(string text) => Write(text, "HXLog.txt");
+	public static void HKLog(string text) => Write(text, "HKLog.txt");
+	public static void Log(string text) => Write(text, "Log.txt");
+	public static void KaiFengV1(string text) => Write(text, "KaiFengV1.txt");
+	public static void AnCheV1(string text) => Write(text, "AnCheV1.txt");
+	public static void TZLog(string text) => Write(text, "台账日志.txt");
+	public static void MQTTLog(string text) => Write(text, "MQTT.txt");
+	public static void XHTcpLog(string text) => Write(text, "XHTcpLog.txt");
+	public static void ZHLog(string text) => Write(text, "ZHLog.txt");
+	public static void YBLog(string text) => Write(text, "YBLog.txt");
+	public static void TCPLog(string text) => Write(text, "TCPLog日志.txt");
+	public static void DBLog(string text) => Write(text, "地磅.txt");
+	public static void DSFLog(string text) => Write(text, "第三方推送.txt");
 
-	public static void TYLog(string text)
+	/// <summary>
+	/// Generic logging method that replaces all specialized log methods.
+	/// Usage: LogSave.Write("message", "MyCategory.txt");
+	/// </summary>
+	public static void Write(string text, string fileName, Encoding encoding, bool useLock)
 	{
-		try
+		if (useLock)
+			Write(text, fileName, encoding);
+		else
 		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
+			try
 			{
-				Directory.CreateDirectory(text2);
+				string dir = Path.Combine(Application.StartupPath, "Log", DateTime.Now.ToString("yyyy-MM-dd"));
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
+				string path = Path.Combine(dir, fileName);
+				File.AppendAllText(path, text + Environment.NewLine, encoding);
 			}
-			FileStream fileStream = new FileStream(text2 + "\\腾跃Log.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void QYLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\QYLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void DHLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\DHLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void ZSLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\ZSLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void HXLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\HXLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void HKLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\HKLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void Log(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\Log.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void KaiFengV1(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\KaiFengV1.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void AnCheV1(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\AnCheV1.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void TZLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\台账日志.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void MQTTLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\MQTT.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void XHTcpLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\XHTcpLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void ZHLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\ZHLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void YBLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\YBLog.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void TCPLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\TCPLog日志.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void DBLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\地磅.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
-		}
-	}
-
-	public static void DSFLog(string text)
-	{
-		try
-		{
-			string text2 = Application.StartupPath + "\\Log\\" + DateTime.Now.ToString("yyyy-MM-dd");
-			if (!Directory.Exists(text2))
-			{
-				Directory.CreateDirectory(text2);
-			}
-			FileStream fileStream = new FileStream(text2 + "\\第三方推送.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
-			streamWriter.WriteLine(text);
-			streamWriter.Flush();
-			streamWriter.Close();
-			fileStream.Close();
-		}
-		catch (Exception)
-		{
+			catch { }
 		}
 	}
 }

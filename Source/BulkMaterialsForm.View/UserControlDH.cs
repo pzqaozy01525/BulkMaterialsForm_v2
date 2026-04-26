@@ -126,7 +126,7 @@ public class UserControlDH : UserControl, IVideoMngInterface
 			dictionary.Add("disposalsiteId", MainData.disposalsiteId);
 			list.Add(dictionary);
 			LogSave.XNCLog(DateTime.Now.ToString() + "获取消纳场设备ID上传结构体" + JsonConvert.SerializeObject(list));
-			xNCResultModel = CommonHelper.PoleXNCResultModel("http://42.236.61.105:8686/approval/county/inoutDevice", MainData.XNCKEY, MainData.XNCSecret, list);
+			xNCResultModel = CommonHelper.PoleXNCResultModel(MainData.XNCInOutServerUrl + MainData.XNCInOutEndpoint, MainData.XNCKEY, MainData.XNCSecret, list);
 			if (xNCResultModel != null)
 			{
 				LogSave.XNCLog(DateTime.Now.ToString() + "获取消纳场设备ID返回内容" + JsonConvert.SerializeObject(xNCResultModel));
@@ -269,7 +269,17 @@ public class UserControlDH : UserControl, IVideoMngInterface
 			text3 = tb_Channel.ChannelPort;
 			string msg2 = "";
 			bool isUpload = false;
-			if (!CommonHelper.GLVerify(text, licenseColor, text3, ref msg2, ref vehicleNoInfoView))
+			bool isBlacklisted = false;
+			List<tb_car_info> carList = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == vehicleNoInfoView.VehicleNo);
+			if (carList != null && carList.Count > 0 && carList[0].bz == "黑名单")
+			{
+				IsRelease = false;
+				isUpload = true;
+				vehicleNoInfoView.ExeLog = "黑名单禁止通行";
+				vehicleNoInfoView.TrafficStatus = "禁止通行";
+				isBlacklisted = true;
+			}
+			if (!isBlacklisted && !CommonHelper.GLVerify(text, licenseColor, text3, ref msg2, ref vehicleNoInfoView))
 			{
 				IsRelease = false;
 				isUpload = true;
@@ -530,8 +540,7 @@ public class UserControlDH : UserControl, IVideoMngInterface
 		if (tb_Device.ChannelNo == Convert.ToInt32(dictionary["ChannelNo"]) && tb_Device.id != Convert.ToInt32(dictionary["DeviceId"]))
 		{
 			ID = Convert.ToInt32(dictionary["id"]);
-			DateTime now = DateTime.Now;
-			string text = string.Format("{0}\\{1}.jpg", MainData.strImageDir, now.ToLocalTime().ToString("yyyyMMddHHmmssfff"));
+			string text = FormHelper.BuildImagePath(MainData.strImageDir, "jpg");
 			if (NETClient.CapturePicture(m_RealPlayID, text, EM_NET_CAPTURE_FORMATS.JPEG))
 			{
 				DataServerContext<tb_ImageDetaile> dataServerContext = new DataServerContext<tb_ImageDetaile>();
@@ -677,8 +686,8 @@ public class UserControlDH : UserControl, IVideoMngInterface
 					byte[] array = new byte[0];
 					if (IntPtr.Zero != pBuffer && dwBufSize != 0)
 					{
-						text2 = string.Format("{0}\\{1}big.jpg", MainData.strImageDir, now.ToLocalTime().ToString("yyyyMMddHHmmssfff"));
-						text3 = string.Format("{0}\\{1}small.jpg", MainData.strImageDir, now.ToLocalTime().ToString("yyyyMMddHHmmssfff"));
+						text2 = Path.Combine(MainData.strImageDir, now.ToString("yyyyMMddHHmmssfff") + "big.jpg");
+						text3 = Path.Combine(MainData.strImageDir, now.ToString("yyyyMMddHHmmssfff") + "small.jpg");
 						array = new byte[dwBufSize];
 						Marshal.Copy(pBuffer, array, 0, (int)dwBufSize);
 						uint dwOffSet = nET_A_DEV_EVENT_TRAFFICJUNCTION_INFO.stuObject.stPicInfo.dwOffSet;
@@ -750,25 +759,35 @@ public class UserControlDH : UserControl, IVideoMngInterface
 					}
 					goto end_IL_002f;
 					IL_08d8:
-					if (MainData.DJPT == "高凌")
+				if (MainData.DJPT == "高凌")
+				{
+					string text4 = "0";
+					text4 = tb_Channel.ChannelPort;
+					string msg = "";
+					bool isUpload = false;
+					bool isBlacklisted = false;
+					List<tb_car_info> carList = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == vehicleNoInfoView.VehicleNo);
+					if (carList != null && carList.Count > 0 && carList[0].bz == "黑名单")
 					{
-						string text4 = "0";
-						text4 = tb_Channel.ChannelPort;
-						string msg = "";
-						bool isUpload = false;
-						if (!CommonHelper.GLVerify(text, vehicleNoInfoView.licenseColor, text4, ref msg, ref vehicleNoInfoView))
-						{
-							isUpload = true;
-							IsRelease = false;
-							vehicleNoInfoView.ExeLog = msg;
-						}
-						if (!MainData.RecordSave(text2, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView, isUpload))
-						{
-							IsRelease = false;
-							vehicleNoInfoView.ExeLog = msg + ";;保存失败";
-						}
+						IsRelease = false;
+						isUpload = true;
+						vehicleNoInfoView.ExeLog = "黑名单禁止通行";
+						vehicleNoInfoView.TrafficStatus = "禁止通行";
+						isBlacklisted = true;
 					}
-					else if (MainData.DJPT == "中科九州")
+					if (!isBlacklisted && !CommonHelper.GLVerify(text, vehicleNoInfoView.licenseColor, text4, ref msg, ref vehicleNoInfoView))
+					{
+						isUpload = true;
+						IsRelease = false;
+						vehicleNoInfoView.ExeLog = msg;
+					}
+					if (!MainData.RecordSave(text2, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView, isUpload))
+					{
+						IsRelease = false;
+						vehicleNoInfoView.ExeLog = msg + ";;保存失败";
+					}
+				}
+				else if (MainData.DJPT == "中科九州")
 					{
 						string text5 = "A";
 						text5 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
@@ -1073,9 +1092,9 @@ public class UserControlDH : UserControl, IVideoMngInterface
 
 	public string storePic(IntPtr vCloseUpPicData, uint nCloseUpPicLen)
 	{
-		string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
+		string text = DateTime.Now.ToString("yyyyMMddHHmmssfff");
 		string text2 = "";
-		text2 = MainData.strImageDir + "\\" + text + ".jpg";
+		text2 = Path.Combine(MainData.strImageDir, text + ".jpg");
 		try
 		{
 			byte[] array = new byte[nCloseUpPicLen];
@@ -1534,7 +1553,7 @@ public class UserControlDH : UserControl, IVideoMngInterface
 										DateTime start = DateTime.Now.AddSeconds(-60.0);
 										DateTime end = DateTime.Now.AddSeconds(60.0);
 										string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-										string sVideoFileName = MainData.strImageDir + "\\" + text + ".mp4";
+										string sVideoFileName = Path.Combine(MainData.strImageDir, DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".mp4");
 										Thread.Sleep(60000);
 										new HKSDK();
 										MainData.hKLXJ.Add(start, end, Convert.ToInt32(zpjList.ChannelID), value, sVideoFileName);

@@ -115,6 +115,7 @@ public class thirdPartytForm : Form
 		List<tb_Channel> list = new DataServerContext<tb_Channel>().Current.GetList();
 		if (list != null && list.Count > 0)
 		{
+			// TODO: Replace hardcoded plate with dynamic input or first available record
 			CommonHelper.TXHGInOutUpLoad(list[0].guid, DateTime.Now, "豫A12345", list[0].ChannelName, list[0].ChannelType, Application.StartupPath + "\\ceshi.jpg");
 		}
 	}

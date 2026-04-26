@@ -38,7 +38,6 @@ public class Manager<T> : IManager<T> where T : class, new()
 		sqlTableName.Contains(typeFromHandle.Name);
 		Db.Aop.OnLogExecuting = delegate
 		{
-			Console.WriteLine();
 		};
 	}
 
@@ -50,7 +49,7 @@ public class Manager<T> : IManager<T> where T : class, new()
 		});
 		if (!dbResult.IsSuccess)
 		{
-			Console.WriteLine(dbResult.ErrorMessage);
+			LogSave.SaveExeLog($"[Manager.AddTran] 事务执行失败: {dbResult.ErrorMessage}");
 		}
 	}
 
@@ -179,7 +178,7 @@ public class Manager<T> : IManager<T> where T : class, new()
 		});
 		if (!dbResult.IsSuccess)
 		{
-			Console.WriteLine(dbResult.ErrorMessage);
+			LogSave.SaveExeLog($"[Manager.DeleteByCondition] 事务执行失败: {dbResult.ErrorMessage}");
 		}
 		return true;
 	}

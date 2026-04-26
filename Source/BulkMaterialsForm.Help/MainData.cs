@@ -138,6 +138,16 @@ public class MainData
 
 	public static string XNCSecret;
 
+	public static string XNCServerUrl = "http://42.236.61.123:8802";
+
+	public static string XNCPoleEndpoint = "/translator/api/disposalInOutVehicle/pole";
+
+	public static string XNCInOutServerUrl = "http://42.236.61.105:8686";
+
+	public static string XNCInOutEndpoint = "/approval/county/inoutDevice";
+
+	public static string WYYServerUrl = "http://fskbtz.weiyouyuan.com.cn";
+
 	public static string companyCodeV1;
 
 	public static string companynumV1;

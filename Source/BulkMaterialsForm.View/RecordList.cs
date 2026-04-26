@@ -278,44 +278,22 @@ public class RecordList : Form
 			List<DataGridViewRow> list = dataGridView1.Rows.Cast<DataGridViewRow>().ToList();
 			if (list.Count == 0)
 			{
-				ShowMessage("无数据可导出");
+				FormHelper.ShowMessage(this, "无数据可导出");
 				return;
 			}
-			Encoding encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
-			using (StreamWriter streamWriter = new StreamWriter(filePath, append: false, encoding))
-			{
-				List<string> values = (from DataGridViewColumn c in dataGridView1.Columns
-					select c.HeaderText ?? "").ToList();
-				streamWriter.WriteLine(string.Join("\t", values));
-				foreach (DataGridViewRow row in list)
-				{
-					List<string> values2 = (from i in Enumerable.Range(0, dataGridView1.ColumnCount)
-						select row.Cells[i].Value?.ToString() ?? "" into v
-						select v.Replace("\t", " ").Replace("\r", "").Replace("\n", " ")).ToList();
-					streamWriter.WriteLine(string.Join("\t", values2));
-				}
-			}
-			ShowMessage($"成功导出 {list.Count} 条记录到：\n{filePath}");
+			var headers = dataGridView1.Columns.Cast<DataGridViewColumn>().Select(c => c.HeaderText ?? "").ToArray();
+			FormHelper.ExportToTsv(dataGridView1, filePath, headers);
+			FormHelper.ShowMessage(this, $"成功导出 {list.Count} 条记录到：\n{filePath}");
 		}
 		catch (Exception ex)
 		{
-			ShowMessage("导出失败：" + ex.Message);
+			FormHelper.ShowError(this, "导出失败：" + ex.Message);
 		}
 	}
 
 	private void ShowMessage(string msg)
 	{
-		if (base.InvokeRequired)
-		{
-			Invoke((Action)delegate
-			{
-				MessageBox.Show(msg);
-			});
-		}
-		else
-		{
-			MessageBox.Show(msg);
-		}
+		FormHelper.ShowMessage(this, msg);
 	}
 
 	private void barButtonItem4_ItemClick(object sender, ItemClickEventArgs e)
@@ -363,18 +341,7 @@ public class RecordList : Form
 		return text = ((text == "") ? "" : text.Substring(0, text.Length - 1));
 	}
 
-	private List<int> GetIds()
-	{
-		List<int> list = new List<int>();
-		foreach (DataGridViewRow item in (IEnumerable)dataGridView1.Rows)
-		{
-			if (Convert.ToBoolean(item.Cells[0].Value))
-			{
-				list.Add(Convert.ToInt32(item.Cells["id"].Value));
-			}
-		}
-		return list;
-	}
+	private List<int> GetIds() => FormHelper.GetSelectedIds(dataGridView1);
 
 	private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
 	{
@@ -411,7 +378,7 @@ public class RecordList : Form
 			{
 				FieldName = "out_type",
 				ConditionalType = ConditionalType.In,
-				FieldValue = new object[] { comboBox1.SelectedItem.ToString(), "服务器下行" }
+				FieldValue = comboBox1.SelectedItem.ToString()
 			});
 		}
 		list.Add(new ConditionalModel
@@ -541,49 +508,36 @@ public class RecordList : Form
 			PageModel page = new PageModel
 			{
 				PageIndex = 0,
-				PageSize = 10000000
+				PageSize = 100000
 			};
 			List<tb_CarRecord> pageList = dataServerContext.Current.GetPageList(conditionalList, page, (tb_CarRecord it) => it.add_time);
 			if (pageList == null || pageList.Count == 0)
 			{
-				ShowMessage("无数据可导出");
+				FormHelper.ShowMessage(this, "无数据可导出");
 				return;
 			}
-			string[] value = new string[13]
+			string[] headers = { "车牌号码", "通行时间", "通行方向", "颜色", "车牌图", "车身图", "状态", "重试次数", "燃料", "排放标准", "通行结果", "货物", "重量(吨)" };
+			FormHelper.ExportToTsv(pageList, filePath, item => new[]
 			{
-				"车牌号码", "通行时间", "通行方向", "颜色", "车牌图", "车身图", "状态", "重试次数", "燃料", "排放标准",
-				"通行结果", "货物", "重量(吨)"
-			};
-			Encoding encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
-			using (StreamWriter streamWriter = new StreamWriter(filePath, append: false, encoding))
-			{
-				streamWriter.WriteLine(string.Join("\t", value));
-				foreach (tb_CarRecord item in pageList)
-				{
-					string[] value2 = new string[13]
-					{
-						item.car_no ?? "",
-						item.add_time.ToString("yyyy-MM-dd HH:mm:ss"),
-						item.out_type ?? "",
-						item.car_color ?? "",
-						item.car_image ?? "",
-						item.front_image ?? "",
-						item.upload_status ?? "",
-						item.upload_number.ToString(),
-						item.fuelType ?? "",
-						item.emissionStandard ?? "",
-						item.gateSignal ?? "",
-						item.cargoName ?? "",
-						item.cargoWeight ?? ""
-					};
-					streamWriter.WriteLine(string.Join("\t", value2));
-				}
-			}
-			ShowMessage($"成功导出 {pageList.Count} 条记录到：\n{filePath}");
+				item.car_no ?? "",
+				item.add_time.ToString("yyyy-MM-dd HH:mm:ss"),
+				item.out_type ?? "",
+				item.car_color ?? "",
+				item.car_image ?? "",
+				item.front_image ?? "",
+				item.upload_status ?? "",
+				item.upload_number.ToString(),
+				item.fuelType ?? "",
+				item.emissionStandard ?? "",
+				item.gateSignal ?? "",
+				item.cargoName ?? "",
+				item.cargoWeight ?? ""
+			}, headers);
+			FormHelper.ShowMessage(this, $"成功导出 {pageList.Count} 条记录到：\n{filePath}");
 		}
 		catch (Exception ex)
 		{
-			ShowMessage("导出失败：" + ex.Message);
+			FormHelper.ShowError(this, "导出失败：" + ex.Message);
 		}
 		finally
 		{
@@ -612,7 +566,7 @@ public class RecordList : Form
 			{
 				FieldName = "out_type",
 				ConditionalType = ConditionalType.In,
-				FieldValue = new object[] { comboBox1.SelectedItem.ToString(), "服务器下行" }
+				FieldValue = comboBox1.SelectedItem.ToString()
 			});
 		}
 		list.Add(new ConditionalModel
@@ -849,7 +803,7 @@ public class RecordList : Form
 		this.barButtonItem9.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(barButtonItem9_ItemClick);
 		this.barButtonItem10.Caption = "重置";
 		this.barButtonItem10.Id = 103;
-		this.barButtonItem10.ImageOptions.Image = BulkMaterialsForm.Properties.Resources.refresh_32x32;
+		this.barButtonItem10.ImageOptions.Image = BulkMaterialsForm.Properties.Resources.backward_32x32;
 		this.barButtonItem10.Name = "barButtonItem10";
 		this.barButtonItem10.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(barButtonItem10_ItemClick);
 		this.barButtonItem7.Caption = "上传货物信息";
@@ -883,21 +837,25 @@ public class RecordList : Form
 		this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
 		this.barDockControlTop.Manager = this.barManager1;
 		this.barDockControlTop.Size = new System.Drawing.Size(1294, 40);
+		this.barDockControlTop.TabIndex = 0;
 		this.barDockControlBottom.CausesValidation = false;
 		this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
 		this.barDockControlBottom.Location = new System.Drawing.Point(0, 730);
 		this.barDockControlBottom.Manager = this.barManager1;
 		this.barDockControlBottom.Size = new System.Drawing.Size(1294, 0);
+		this.barDockControlBottom.TabIndex = 0;
 		this.barDockControlLeft.CausesValidation = false;
 		this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
 		this.barDockControlLeft.Location = new System.Drawing.Point(0, 40);
 		this.barDockControlLeft.Manager = this.barManager1;
 		this.barDockControlLeft.Size = new System.Drawing.Size(0, 690);
+		this.barDockControlLeft.TabIndex = 0;
 		this.barDockControlRight.CausesValidation = false;
 		this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
 		this.barDockControlRight.Location = new System.Drawing.Point(1294, 40);
 		this.barDockControlRight.Manager = this.barManager1;
 		this.barDockControlRight.Size = new System.Drawing.Size(0, 690);
+		this.barDockControlRight.TabIndex = 0;
 		this.tableLayoutPanel1.ColumnCount = 1;
 		this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100f));
 		this.tableLayoutPanel1.Controls.Add(this.dataGridView1, 0, 1);
@@ -911,7 +869,7 @@ public class RecordList : Form
 		this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 94.11765f));
 		this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.882353f));
 		this.tableLayoutPanel1.Size = new System.Drawing.Size(1294, 690);
-		this.tableLayoutPanel1.TabIndex = 4;
+		this.tableLayoutPanel1.TabIndex = 0;
 		this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
 		this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 		this.dataGridView1.Columns.AddRange(this.Column1);
@@ -921,7 +879,7 @@ public class RecordList : Form
 		this.dataGridView1.ReadOnly = true;
 		this.dataGridView1.RowTemplate.Height = 26;
 		this.dataGridView1.Size = new System.Drawing.Size(1288, 530);
-		this.dataGridView1.TabIndex = 1;
+		this.dataGridView1.TabIndex = 20;
 		this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellClick);
 		this.Column1.HeaderText = "";
 		this.Column1.Name = "Column1";
@@ -960,7 +918,7 @@ public class RecordList : Form
 		this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333f));
 		this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333f));
 		this.tableLayoutPanel2.Size = new System.Drawing.Size(1288, 114);
-		this.tableLayoutPanel2.TabIndex = 2;
+		this.tableLayoutPanel2.TabIndex = 10;
 		this.label8.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label8.AutoSize = true;
 		this.label8.BackColor = System.Drawing.Color.Transparent;
@@ -986,7 +944,7 @@ public class RecordList : Form
 		this.label2.Location = new System.Drawing.Point(51, 8);
 		this.label2.Name = "label2";
 		this.label2.Size = new System.Drawing.Size(74, 21);
-		this.label2.TabIndex = 39;
+		this.label2.TabIndex = 38;
 		this.label2.Text = "车牌号：";
 		this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label4.AutoSize = true;
@@ -1003,7 +961,7 @@ public class RecordList : Form
 		this.textBox1.Location = new System.Drawing.Point(131, 4);
 		this.textBox1.Name = "textBox1";
 		this.textBox1.Size = new System.Drawing.Size(251, 29);
-		this.textBox1.TabIndex = 38;
+		this.textBox1.TabIndex = 37;
 		this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label1.AutoSize = true;
 		this.label1.BackColor = System.Drawing.Color.Transparent;
@@ -1012,7 +970,7 @@ public class RecordList : Form
 		this.label1.Location = new System.Drawing.Point(420, 8);
 		this.label1.Name = "label1";
 		this.label1.Size = new System.Drawing.Size(90, 21);
-		this.label1.TabIndex = 41;
+		this.label1.TabIndex = 40;
 		this.label1.Text = "进出类型：";
 		this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label3.AutoSize = true;
@@ -1038,7 +996,7 @@ public class RecordList : Form
 		this.comboBox1.Location = new System.Drawing.Point(516, 4);
 		this.comboBox1.Name = "comboBox1";
 		this.comboBox1.Size = new System.Drawing.Size(251, 29);
-		this.comboBox1.TabIndex = 46;
+		this.comboBox1.TabIndex = 39;
 		this.label6.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label6.AutoSize = true;
 		this.label6.BackColor = System.Drawing.Color.Transparent;
@@ -1122,7 +1080,7 @@ public class RecordList : Form
 		this.pager1.PageCurrent = 0;
 		this.pager1.PageSize = 20;
 		this.pager1.Size = new System.Drawing.Size(1288, 28);
-		this.pager1.TabIndex = 3;
+		this.pager1.TabIndex = 30;
 		this.pager1.EventPaging += new BST.Ticket.EventPagingHandler(pager1_EventPaging);
 		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 12f);
 		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

@@ -168,7 +168,7 @@ public class LED
 	{
 		try
 		{
-			byte[] bytes = Encoding.Default.GetBytes(ShowText);
+			byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(ShowText);
 			int num = bytes.Length;
 			if (num > 200)
 			{

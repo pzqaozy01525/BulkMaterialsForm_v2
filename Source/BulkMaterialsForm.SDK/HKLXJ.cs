@@ -47,7 +47,7 @@ public class HKLXJ
 		MainData.init_Sdk_HaiKang();
 		CHCNetSDK.NET_DVR_DEVICEINFO_V30 lpDeviceInfo = default(CHCNetSDK.NET_DVR_DEVICEINFO_V30);
 		m_lUserID = CHCNetSDK.NET_DVR_Login_V30(IP, 8000, doccode, pass, ref lpDeviceInfo);
-		LogSave.HKLog(DateTime.Now.ToString() + "设备IP:" + IP + "账号：" + doccode + "密码：" + pass + "录像机登录_logHandle" + m_lUserID);
+		LogSave.HKLog($"海康录像机登录: IP={IP}, User={doccode}, Handle={m_lUserID}");
 		if (m_lUserID < 0)
 		{
 			return -1;

@@ -3,6 +3,7 @@
 // Type: BulkMaterialsForm.SDK.HKOperate
 
 using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using BulkMaterialsForm.Help;
@@ -26,13 +27,13 @@ public class HKOperate
 	public void Init()
 	{
 		CHCNetSDK.NET_DVR_USER_LOGIN_INFO pLoginInfo = default(CHCNetSDK.NET_DVR_USER_LOGIN_INFO);
-		byte[] bytes = Encoding.Default.GetBytes(tb_Videotape.IP);
+		byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(tb_Videotape.IP);
 		pLoginInfo.sDeviceAddress = new byte[129];
 		bytes.CopyTo(pLoginInfo.sDeviceAddress, 0);
-		byte[] bytes2 = Encoding.Default.GetBytes(tb_Videotape.doccode);
+		byte[] bytes2 = Encoding.GetEncoding("GBK").GetBytes(tb_Videotape.doccode);
 		pLoginInfo.sUserName = new byte[64];
 		bytes2.CopyTo(pLoginInfo.sUserName, 0);
-		byte[] bytes3 = Encoding.Default.GetBytes(tb_Videotape.pass);
+		byte[] bytes3 = Encoding.GetEncoding("GBK").GetBytes(tb_Videotape.pass);
 		pLoginInfo.sPassword = new byte[64];
 		bytes3.CopyTo(pLoginInfo.sPassword, 0);
 		pLoginInfo.wPort = 8000;
@@ -52,7 +53,7 @@ public class HKOperate
 			{
 				RecordId = Id;
 				string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-				string strImageFile = MainData.strImageDir + "\\" + text + "zp.jpg";
+				string strImageFile = Path.Combine(MainData.strImageDir, text + "zp.jpg");
 				int lChannel = 1;
 				CHCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new CHCNetSDK.NET_DVR_JPEGPARA
 				{

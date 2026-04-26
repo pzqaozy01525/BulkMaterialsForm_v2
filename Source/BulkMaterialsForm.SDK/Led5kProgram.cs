@@ -108,7 +108,7 @@ public class Led5kProgram
 			array3[6] = byte2bcd(EndMonth);
 			array3[7] = byte2bcd(EndDay);
 		}
-		byte[] bytes = Encoding.Default.GetBytes(name);
+		byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(name);
 		byte[] period = ((!IsPlayOnTime) ? null : new byte[7]
 		{
 			byte2bcd(StartHour),

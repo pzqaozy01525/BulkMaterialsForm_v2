@@ -157,15 +157,22 @@ internal static class Program
 	private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 	{
 		Exception exception = e.Exception;
-		MessageBox.Show("应用程序遇到错误，请查看日志文件获取详细信息。", "应用程序错误", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-		LogSave.SaveExeLog($"Application_ThreadException: {exception}");
+		string fullDetail = $"[ThreadException] {exception.GetType().Name}: {exception.Message}\n调用堆栈:\n{exception.StackTrace}";
+		if (exception.InnerException != null)
+			fullDetail += $"\n内部异常: {exception.InnerException.Message}";
+		LogSave.SaveExeLog(fullDetail);
+		MessageBox.Show($"应用程序遇到错误：{exception.Message}\n\n详细信息已记录到日志文件。", "应用程序错误", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 	}
 
 	private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 	{
-		Exception arg = e.ExceptionObject as Exception;
-		MessageBox.Show("发生未处理的严重错误，请重启应用程序。", "严重错误", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-		LogSave.SaveExeLog($"CurrentDomain_UnhandledException: {arg}");
+		Exception exception = e.ExceptionObject as Exception;
+		string fullDetail = $"[UnhandledException] IsTerminating={e.IsTerminating}\n{(exception != null ? $"{exception.GetType().Name}: {exception.Message}\n调用堆栈:\n{exception?.StackTrace}" : e.ExceptionObject.ToString())}";
+		LogSave.SaveExeLog(fullDetail);
+		if (e.IsTerminating)
+		{
+			MessageBox.Show($"发生未处理的严重错误，程序即将退出。\n\n详细信息已记录到日志文件。", "严重错误", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+		}
 	}
 
 	private static void StartMainFormDirectly()

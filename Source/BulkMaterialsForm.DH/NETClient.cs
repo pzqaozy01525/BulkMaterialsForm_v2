@@ -2647,16 +2647,16 @@ public static class NETClient
 
 	public static void MultiArraySet(int index, int maxLen, string src, ref string dst)
 	{
-		byte[] bytes = Encoding.Default.GetBytes(src);
-		byte[] bytes2 = Encoding.Default.GetBytes(dst);
+		byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(src);
+		byte[] bytes2 = Encoding.GetEncoding("GBK").GetBytes(dst);
 		bytes.CopyTo(bytes2, index * maxLen);
-		dst = Encoding.Default.GetString(bytes2);
+		dst = Encoding.GetEncoding("GBK").GetString(bytes2);
 	}
 
 	public static string MultiArrayGet(int index, int maxLen, string dst)
 	{
-		byte[] bytes = Encoding.Default.GetBytes(dst);
-		return Encoding.Default.GetString(bytes, index * maxLen, maxLen);
+		byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(dst);
+		return Encoding.GetEncoding("GBK").GetString(bytes, index * maxLen, maxLen);
 	}
 
 	public static bool PlayBackControl(IntPtr lPlayHandle, PlayBackType type)

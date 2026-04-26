@@ -3,6 +3,7 @@
 // Type: BulkMaterialsForm.SDK.HKSDK
 
 using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using BulkMaterialsForm.Help;
@@ -19,20 +20,20 @@ public class HKSDK
 	{
 		MainData.init_Sdk_HaiKang();
 		CHCNetSDK.NET_DVR_USER_LOGIN_INFO pLoginInfo = default(CHCNetSDK.NET_DVR_USER_LOGIN_INFO);
-		byte[] bytes = Encoding.Default.GetBytes(IP);
+		byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(IP);
 		pLoginInfo.sDeviceAddress = new byte[129];
 		bytes.CopyTo(pLoginInfo.sDeviceAddress, 0);
-		byte[] bytes2 = Encoding.Default.GetBytes(doccode);
+		byte[] bytes2 = Encoding.GetEncoding("GBK").GetBytes(doccode);
 		pLoginInfo.sUserName = new byte[64];
 		bytes2.CopyTo(pLoginInfo.sUserName, 0);
-		byte[] bytes3 = Encoding.Default.GetBytes(pass);
+		byte[] bytes3 = Encoding.GetEncoding("GBK").GetBytes(pass);
 		pLoginInfo.sPassword = new byte[64];
 		bytes3.CopyTo(pLoginInfo.sPassword, 0);
 		pLoginInfo.wPort = 8000;
 		pLoginInfo.bUseAsynLogin = false;
 		CHCNetSDK.NET_DVR_DEVICEINFO_V40 lpDeviceInfo = default(CHCNetSDK.NET_DVR_DEVICEINFO_V40);
 		int num = CHCNetSDK.NET_DVR_Login_V40(ref pLoginInfo, ref lpDeviceInfo);
-		LogSave.HKLog(DateTime.Now.ToString() + "设备IP:" + IP + "账号：" + doccode + "密码：" + pass + "抓拍机登录_logHandle" + num);
+		LogSave.HKLog($"海康抓拍机登录: IP={IP}, User={doccode}, Handle={num}");
 		if (num < 0)
 		{
 			return -1;
@@ -47,7 +48,7 @@ public class HKSDK
 			for (int i = 0; i < 3; i++)
 			{
 				string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-				string strImageFile = MainData.strImageDir + "\\" + text + "zp.jpg";
+				string strImageFile = Path.Combine(MainData.strImageDir, text + "zp.jpg");
 				int lChannel = 1;
 				CHCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new CHCNetSDK.NET_DVR_JPEGPARA
 				{
@@ -124,7 +125,7 @@ public class HKSDK
 				}
 			};
 			string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-			string sVideoFileName = MainData.strImageDir + "\\" + text + ".mp4";
+			string sVideoFileName = Path.Combine(MainData.strImageDir, text + ".mp4");
 			m_lDownHandle = CHCNetSDK.NET_DVR_GetFileByTime_V40(m_lUserID, sVideoFileName, ref pDownloadCond);
 			if (m_lDownHandle < 0)
 			{
@@ -150,7 +151,7 @@ public class HKSDK
 
 	public void timerProgress()
 	{
-		while (true)
+		while (m_lDownHandle >= 0)
 		{
 			try
 			{
@@ -162,14 +163,21 @@ public class HKSDK
 					}
 					Thread.Sleep(3000);
 				}
+				else
+				{
+					Thread.Sleep(1000);
+				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				LogSave.SaveExeLog($"[HKSDK.timerProgress] 异常: {ex.Message}");
 			}
 		}
+		LogSave.SaveExeLog("[HKSDK.timerProgress] 线程正常退出");
 	}
 
 	public void Close()
 	{
+		m_lDownHandle = -1;
 	}
 }

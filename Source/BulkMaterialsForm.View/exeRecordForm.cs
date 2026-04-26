@@ -360,7 +360,7 @@ public class exeRecordForm : Form
 			PageModel page = new PageModel
 			{
 				PageIndex = 0,
-				PageSize = 10000000
+				PageSize = 100000
 			};
 			List<tb_exceptional> pageList = dataServerContext.Current.GetPageList(conditionalList, page, (tb_exceptional it) => it.add_time, OrderByType.Desc);
 			if (pageList == null || pageList.Count == 0)
@@ -400,17 +400,7 @@ public class exeRecordForm : Form
 
 	private void ShowMessage(string msg)
 	{
-		if (base.InvokeRequired)
-		{
-			Invoke((Action)delegate
-			{
-				MessageBox.Show(msg);
-			});
-		}
-		else
-		{
-			MessageBox.Show(msg);
-		}
+		FormHelper.ShowMessage(this, msg);
 	}
 
 	protected override void Dispose(bool disposing)

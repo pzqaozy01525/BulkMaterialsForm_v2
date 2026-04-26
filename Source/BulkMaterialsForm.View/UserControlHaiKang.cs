@@ -150,7 +150,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			dictionary.Add("disposalsiteId", MainData.disposalsiteId);
 			list.Add(dictionary);
 			LogSave.XNCLog(DateTime.Now.ToString() + "获取消纳场设备ID上传结构体" + JsonConvert.SerializeObject(list));
-			xNCResultModel = CommonHelper.PoleXNCResultModel("http://42.236.61.105:8686/approval/county/inoutDevice", MainData.XNCKEY, MainData.XNCSecret, list);
+			xNCResultModel = CommonHelper.PoleXNCResultModel(MainData.XNCInOutServerUrl + MainData.XNCInOutEndpoint, MainData.XNCKEY, MainData.XNCSecret, list);
 			if (xNCResultModel != null)
 			{
 				LogSave.XNCLog(DateTime.Now.ToString() + "获取消纳场设备ID返回内容" + JsonConvert.SerializeObject(xNCResultModel));
@@ -325,7 +325,17 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			text3 = tb_Channel.ChannelPort;
 			string msg2 = "";
 			bool isUpload = false;
-			if (!CommonHelper.GLVerify(text, licenseColor, text3, ref msg2, ref vehicleNoInfoView))
+			bool isBlacklisted = false;
+			List<tb_car_info> carList = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == vehicleNoInfoView.VehicleNo);
+			if (carList != null && carList.Count > 0 && carList[0].bz == "黑名单")
+			{
+				IsRelease = false;
+				isUpload = true;
+				vehicleNoInfoView.ExeLog = "黑名单禁止通行";
+				vehicleNoInfoView.TrafficStatus = "禁止通行";
+				isBlacklisted = true;
+			}
+			if (!isBlacklisted && !CommonHelper.GLVerify(text, licenseColor, text3, ref msg2, ref vehicleNoInfoView))
 			{
 				IsRelease = false;
 				isUpload = true;
@@ -738,13 +748,13 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			{
 				try
 				{
-					byte[] bytes = Encoding.Default.GetBytes(tb_Device.CameraIP);
+					byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(tb_Device.CameraIP);
 					struLogInfo.sDeviceAddress = new byte[129];
 					bytes.CopyTo(struLogInfo.sDeviceAddress, 0);
-					byte[] bytes2 = Encoding.Default.GetBytes(MainData.HKUserName);
+					byte[] bytes2 = Encoding.GetEncoding("GBK").GetBytes(MainData.HKUserName);
 					struLogInfo.sUserName = new byte[64];
 					bytes2.CopyTo(struLogInfo.sUserName, 0);
-					byte[] bytes3 = Encoding.Default.GetBytes(MainData.HKPassword);
+					byte[] bytes3 = Encoding.GetEncoding("GBK").GetBytes(MainData.HKPassword);
 					struLogInfo.sPassword = new byte[64];
 					bytes3.CopyTo(struLogInfo.sPassword, 0);
 					struLogInfo.wPort = 8000;
@@ -756,13 +766,13 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 					struLogInfo.bUseAsynLogin = false;
 					DeviceInfo = default(CHCNetSDK.NET_DVR_DEVICEINFO_V40);
 					_logHandle = CHCNetSDK.NET_DVR_Login_V40(ref struLogInfo, ref DeviceInfo);
-					LogSave.HKLog("账号" + MainData.HKUserName + "密码" + MainData.HKPassword + tb_Device.CameraIP + "_logHandle" + _logHandle);
-					if (_logHandle < 0)
-					{
-						uint num = CHCNetSDK.NET_DVR_GetLastError();
-						LogSave.HKLog("账号" + MainData.HKUserName + "密码" + MainData.HKPassword + tb_Device.CameraIP + ";;NET_DVR_Login_V40:" + num);
-						setButtonEnable(btEnable: false);
-					}
+				LogSave.HKLog($"海康登录: IP={tb_Device.CameraIP}, User={MainData.HKUserName}, Handle={_logHandle}");
+				if (_logHandle < 0)
+				{
+					uint num = CHCNetSDK.NET_DVR_GetLastError();
+					LogSave.HKLog($"海康登录失败: IP={tb_Device.CameraIP}, User={MainData.HKUserName}, ErrorCode={num}");
+					setButtonEnable(btEnable: false);
+				}
 					else
 					{
 						CHCNetSDK.NET_DVR_PREVIEWINFO lpPreviewInfo = new CHCNetSDK.NET_DVR_PREVIEWINFO
@@ -876,10 +886,19 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			byLaneNo = 1,
 			byBarrierGateCtrl = 0
 		};
-		int num = (structure.dwSize = Marshal.SizeOf(structure));
-		IntPtr intPtr = Marshal.AllocHGlobal(num);
-		Marshal.StructureToPtr(structure, intPtr, fDeleteOld: true);
-		CHCNetSDK.NET_DVR_RemoteControl(_logHandle, 3128u, intPtr, num);
+		int cb = Marshal.SizeOf(structure);
+		IntPtr ptr = IntPtr.Zero;
+		try
+		{
+			ptr = Marshal.AllocHGlobal(cb);
+			Marshal.StructureToPtr(structure, ptr, fDeleteOld: true);
+			CHCNetSDK.NET_DVR_RemoteControl(_logHandle, 3128u, ptr, cb);
+		}
+		finally
+		{
+			if (ptr != IntPtr.Zero)
+				Marshal.FreeHGlobal(ptr);
+		}
 	}
 
 	public void Open()
@@ -890,10 +909,19 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			byLaneNo = 1,
 			byBarrierGateCtrl = 1
 		};
-		int num = (structure.dwSize = Marshal.SizeOf(structure));
-		IntPtr intPtr = Marshal.AllocHGlobal(num);
-		Marshal.StructureToPtr(structure, intPtr, fDeleteOld: true);
-		CHCNetSDK.NET_DVR_RemoteControl(_logHandle, 3128u, intPtr, num);
+		int cb = Marshal.SizeOf(structure);
+		IntPtr ptr = IntPtr.Zero;
+		try
+		{
+			ptr = Marshal.AllocHGlobal(cb);
+			Marshal.StructureToPtr(structure, ptr, fDeleteOld: true);
+			CHCNetSDK.NET_DVR_RemoteControl(_logHandle, 3128u, ptr, cb);
+		}
+		finally
+		{
+			if (ptr != IntPtr.Zero)
+				Marshal.FreeHGlobal(ptr);
+		}
 	}
 
 	public bool MsgCallback_V31(int lCommand, ref CHCNetSDK.NET_DVR_ALARMER pAlarmer, IntPtr pAlarmInfo, uint dwBufLen, IntPtr pUser)
@@ -904,7 +932,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			{
 				return false;
 			}
-			string text = Encoding.Default.GetString(pAlarmer.sDeviceIP).TrimEnd(default(char));
+			string text = Encoding.GetEncoding("GBK").GetString(pAlarmer.sDeviceIP).TrimEnd(default(char));
 			if (lCommand == 12368)
 			{
 				NumberPlay = 10;
@@ -944,7 +972,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 						string empty = string.Empty;
 						byte[] array2 = new byte[2];
 						Buffer.BlockCopy(nET_ITS_PLATE_RESULT.struPlateInfo.sLicense, 0, array2, 0, 2);
-						empty = Encoding.Default.GetString(array2) + "色";
+						empty = Encoding.GetEncoding("GBK").GetString(array2) + "色";
 						LogSave.QYLog(DateTime.Now.ToString() + text2 + "车牌开始" + empty);
 						string car_image = "";
 						string text3 = "";
@@ -954,9 +982,9 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 							{
 								if (nET_ITS_PLATE_RESULT.struPicInfo[i].dwDataLen != 0)
 								{
-									string text4 = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-									string text5 = MainData.strImageDir + "\\" + text4 + ".jpg";
-									FileStream fileStream = new FileStream(text5, FileMode.Create);
+								string text4 = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+								string text5 = Path.Combine(MainData.strImageDir, text4 + ".jpg");
+								FileStream fileStream = new FileStream(text5, FileMode.Create);
 									int dwDataLen = (int)nET_ITS_PLATE_RESULT.struPicInfo[i].dwDataLen;
 									byte[] array3 = new byte[dwDataLen];
 									Marshal.Copy(nET_ITS_PLATE_RESULT.struPicInfo[i].pBuffer, array3, 0, dwDataLen);
@@ -1122,7 +1150,17 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 							text9 = tb_Channel.ChannelPort;
 							string msg2 = "";
 							bool isUpload = false;
-							if (!CommonHelper.GLVerify(text2, vehicleNoInfoView.licenseColor, text9, ref msg2, ref vehicleNoInfoView))
+							bool isBlacklisted = false;
+							List<tb_car_info> carList = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == vehicleNoInfoView.VehicleNo);
+							if (carList != null && carList.Count > 0 && carList[0].bz == "黑名单")
+							{
+								IsRelease = false;
+								isUpload = true;
+								vehicleNoInfoView.ExeLog = "黑名单禁止通行";
+								vehicleNoInfoView.TrafficStatus = "禁止通行";
+								isBlacklisted = true;
+							}
+							if (!isBlacklisted && !CommonHelper.GLVerify(text2, vehicleNoInfoView.licenseColor, text9, ref msg2, ref vehicleNoInfoView))
 							{
 								IsRelease = false;
 								isUpload = true;
@@ -1525,7 +1563,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 		{
 			byte[] array = new byte[tPicInfo.uiVehiclePicLen];
 			Marshal.Copy(tPicInfo.ptVehiclePicBuff, array, 0, (int)tPicInfo.uiVehiclePicLen);
-			text = MainData.strImageDir + "\\" + text2 + ".jpg";
+			text = Path.Combine(MainData.strImageDir, text2 + ".jpg");
 			FileStream fileStream = new FileStream(text, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
 			fileStream.Write(array, 0, (int)tPicInfo.uiVehiclePicLen);
 			fileStream.Close();
@@ -1540,8 +1578,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 		if (tb_Device.ChannelNo == Convert.ToInt32(dictionary["ChannelNo"]) && tb_Device.id != Convert.ToInt32(dictionary["DeviceId"]))
 		{
 			ID = Convert.ToInt32(dictionary["id"]);
-			DateTime now = DateTime.Now;
-			string text = string.Format("{0}\\{1}.jpg", MainData.strImageDir, now.ToLocalTime().ToString("yyyyMMddHHmmssfff"));
+			string text = Path.Combine(MainData.strImageDir, DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".jpg");
 			CHCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new CHCNetSDK.NET_DVR_JPEGPARA
 			{
 				wPicQuality = 0,
@@ -1660,7 +1697,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 	{
 		try
 		{
-			WebRequest webRequest = WebRequest.Create(url);
+			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
 			webRequest.Method = method;
 			webRequest.Credentials = new NetworkCredential(MainData.HKUserName, MainData.HKPassword);
 			if (method != "Get")
@@ -1670,16 +1707,22 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 				byte[] bytes = Encoding.UTF8.GetBytes(text);
 				webRequest.ContentType = "application/json";
 				webRequest.ContentLength = bytes.Length;
-				Stream requestStream = webRequest.GetRequestStream();
-				requestStream.Write(bytes, 0, bytes.Length);
-				requestStream.Close();
+				using (Stream requestStream = webRequest.GetRequestStream())
+				{
+					requestStream.Write(bytes, 0, bytes.Length);
+				}
 			}
-			string text2 = new StreamReader(((HttpWebResponse)webRequest.GetResponse()).GetResponseStream(), Encoding.UTF8).ReadToEnd();
-			LogSave.HKLog(DateTime.Now.ToString() + url + "返回内容=" + text2);
+			using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
+			using (Stream responseStream = webResponse.GetResponseStream())
+			using (StreamReader reader = new StreamReader(responseStream, Encoding.UTF8))
+			{
+				string text2 = reader.ReadToEnd();
+				LogSave.HKLog(DateTime.Now.ToString() + url + "返回内容=" + text2);
+			}
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine(ex.Message);
+			LogSave.SaveExeLog($"[HaiKangSend] 请求失败: {ex.Message}");
 		}
 	}
 
@@ -1739,362 +1782,383 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 			pBuffer4 = Marshal.AllocHGlobal(31457280),
 			pBuffer5 = Marshal.AllocHGlobal(31457280)
 		};
-		if (!CHCNetSDK.NET_DVR_ManualSnap(_logHandle, ref lpInter, ref lpOuter))
+		try
 		{
-			return;
-		}
-		byte[] array = new byte[lpOuter.struPlateInfo.sLicense.Length - 2];
-		Buffer.BlockCopy(lpOuter.struPlateInfo.sLicense, 2, array, 0, array.Length);
-		string text = Encoding.GetEncoding("GBK").GetString(array).TrimEnd(default(char));
-		licensePlate = text;
-		if (text.IndexOf("加密") >= 0)
-		{
-			showVehicleNo(text);
-			licensePlate = "";
-			return;
-		}
-		showVehicleNo(text + "，平台验证中！");
-		if (text.Length < 7)
-		{
-			licensePlate = "";
-			showVehicleNo("未识别到正确车牌");
-			return;
-		}
-		LedPrompt(text);
-		_ = DateTime.Now;
-		string empty = string.Empty;
-		byte[] array2 = new byte[2];
-		Buffer.BlockCopy(lpOuter.struPlateInfo.sLicense, 0, array2, 0, 2);
-		empty = Encoding.Default.GetString(array2) + "色";
-		LogSave.QYLog(DateTime.Now.ToString() + text + "车牌开始" + empty);
-		CHCNetSDK.NET_DVR_JPEGPARA nET_DVR_JPEGPARA = new CHCNetSDK.NET_DVR_JPEGPARA
-		{
-			wPicQuality = 0,
-			wPicSize = 255
-		};
-		string text2 = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-		string car_image = "";
-		string text3 = "";
-		string text4 = MainData.strImageDir + "\\" + text2 + ".jpg";
-		if (CHCNetSDK.NET_DVR_CapturePicture(_logHandle, text4))
-		{
-			text3 = text4;
-		}
-		if (!(tb_Device.CameraType == "标准相机"))
-		{
-			goto IL_0e24;
-		}
-		bool IsRelease = true;
-		VehicleNoInfoView vehicleNoInfoView = new VehicleNoInfoView();
-		vehicleNoInfoView.VehicleNo = text;
-		vehicleNoInfoView.AddTime = DateTime.Now;
-		vehicleNoInfoView.ChannelName = tb_Channel.ChannelName;
-		vehicleNoInfoView.DeviceName = tb_Device.CameraName;
-		vehicleNoInfoView.ChannelType = tb_Channel.ChannelType;
-		vehicleNoInfoView.ImagePath = text3;
-		vehicleNoInfoView.largeId = tb_Device.bigScreenId;
-		vehicleNoInfoView.licenseColor = empty;
-		vehicleNoInfoView.ChannelId = tb_Device.ChannelNo;
-		vehicleNoInfoView.devId = tb_Device.id;
-		if (seniorSet == null)
-		{
-			goto IL_0453;
-		}
-		string[] array3 = seniorSet.transitColour.Split(',');
-		if (array3 != null && array3.Length != 0 && !array3.Contains(empty))
-		{
-			vehicleNoInfoView.ExeLog = "此通道禁止此车牌颜色通行";
-			vehicleNoInfoView.TrafficStatus = "禁止通行";
-		}
-		else
-		{
-			string[] array4 = seniorSet.ColourWhiteList.Split(',');
-			if (array4 == null || array4.Length == 0 || !array4.Contains(empty) || new DataServerContext<tb_car_info>().Current.GetModel((tb_car_info it) => it.car_no == text) != null)
+			if (!CHCNetSDK.NET_DVR_ManualSnap(_logHandle, ref lpInter, ref lpOuter))
+			{
+				return;
+			}
+			byte[] array = new byte[lpOuter.struPlateInfo.sLicense.Length - 2];
+			Buffer.BlockCopy(lpOuter.struPlateInfo.sLicense, 2, array, 0, array.Length);
+			string text = Encoding.GetEncoding("GBK").GetString(array).TrimEnd(default(char));
+			licensePlate = text;
+			if (text.IndexOf("加密") >= 0)
+			{
+				showVehicleNo(text);
+				licensePlate = "";
+				return;
+			}
+			showVehicleNo(text + "，平台验证中！");
+			if (text.Length < 7)
+			{
+				licensePlate = "";
+				showVehicleNo("未识别到正确车牌");
+				return;
+			}
+			LedPrompt(text);
+			_ = DateTime.Now;
+			string empty = string.Empty;
+			byte[] array2 = new byte[2];
+			Buffer.BlockCopy(lpOuter.struPlateInfo.sLicense, 0, array2, 0, 2);
+			empty = Encoding.GetEncoding("GBK").GetString(array2) + "色";
+			LogSave.QYLog(DateTime.Now.ToString() + text + "车牌开始" + empty);
+			CHCNetSDK.NET_DVR_JPEGPARA nET_DVR_JPEGPARA = new CHCNetSDK.NET_DVR_JPEGPARA
+			{
+				wPicQuality = 0,
+				wPicSize = 255
+			};
+			string text2 = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
+			string car_image = "";
+			string text3 = "";
+			string text4 = Path.Combine(MainData.strImageDir, text2 + ".jpg");
+			if (CHCNetSDK.NET_DVR_CapturePicture(_logHandle, text4))
+			{
+				text3 = text4;
+			}
+			if (!(tb_Device.CameraType == "标准相机"))
+			{
+				goto IL_0e24;
+			}
+			bool IsRelease = true;
+			VehicleNoInfoView vehicleNoInfoView = new VehicleNoInfoView();
+			vehicleNoInfoView.VehicleNo = text;
+			vehicleNoInfoView.AddTime = DateTime.Now;
+			vehicleNoInfoView.ChannelName = tb_Channel.ChannelName;
+			vehicleNoInfoView.DeviceName = tb_Device.CameraName;
+			vehicleNoInfoView.ChannelType = tb_Channel.ChannelType;
+			vehicleNoInfoView.ImagePath = text3;
+			vehicleNoInfoView.largeId = tb_Device.bigScreenId;
+			vehicleNoInfoView.licenseColor = empty;
+			vehicleNoInfoView.ChannelId = tb_Device.ChannelNo;
+			vehicleNoInfoView.devId = tb_Device.id;
+			if (seniorSet == null)
 			{
 				goto IL_0453;
 			}
-			vehicleNoInfoView.ExeLog = "此车牌号不属于白名单";
-			vehicleNoInfoView.TrafficStatus = "禁止通行";
-		}
-		goto IL_0e30;
-		IL_0453:
-		List<tb_car_info> list = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == text);
-		if (list != null && list.Count > 0)
-		{
-			if (list[0].bz == "黑名单")
+			string[] array3 = seniorSet.transitColour.Split(',');
+			if (array3 != null && array3.Length != 0 && !array3.Contains(empty))
 			{
+				vehicleNoInfoView.ExeLog = "此通道禁止此车牌颜色通行";
 				vehicleNoInfoView.TrafficStatus = "禁止通行";
-				vehicleNoInfoView.ExeLog = "黑名单禁止通行";
 			}
-			else if (!(vehicleNoInfoView.AddTime >= list[0].startTime) || !(vehicleNoInfoView.AddTime <= list[0].endTime))
+			else
 			{
+				string[] array4 = seniorSet.ColourWhiteList.Split(',');
+				if (array4 == null || array4.Length == 0 || !array4.Contains(empty) || new DataServerContext<tb_car_info>().Current.GetModel((tb_car_info it) => it.car_no == text) != null)
+				{
+					goto IL_0453;
+				}
+				vehicleNoInfoView.ExeLog = "此车牌号不属于白名单";
 				vehicleNoInfoView.TrafficStatus = "禁止通行";
-				vehicleNoInfoView.ExeLog = "未在有效期以内";
 			}
-			else if (MainData.BMDSC)
+			goto IL_0e30;
+			IL_0453:
+			List<tb_car_info> list = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == text);
+			if (list != null && list.Count > 0)
 			{
-				goto IL_05da;
-			}
-		}
-		else
-		{
-			if (MainData.SDZK)
-			{
-				isrg = true;
-				goto IL_05b8;
-			}
-			if (!MainData.LSCSN)
-			{
-				goto IL_05da;
-			}
-			vehicleNoInfoView.ExeLog = "临时车禁止通行";
-			IsRelease = false;
-		}
-		goto IL_0e30;
-		IL_0e30:
-		if (MainData.dnyybb)
-		{
-			Task.Factory.StartNew(delegate
-			{
-				string text19 = "禁止通行";
-				if (IsRelease)
+				if (list[0].bz == "黑名单")
 				{
-					text19 = "允许通行";
-					SpeechSynthesizer obj = new SpeechSynthesizer
-					{
-						Rate = 1,
-						Volume = 100
-					};
-					text = vehicleNoInfoView.VehicleNo + vehicleNoInfoView.emissionStandard + vehicleNoInfoView.fuelType + text19;
-					obj.Speak(text);
+					vehicleNoInfoView.TrafficStatus = "禁止通行";
+					vehicleNoInfoView.ExeLog = "黑名单禁止通行";
 				}
-				else
+				else if (!(vehicleNoInfoView.AddTime >= list[0].startTime) || !(vehicleNoInfoView.AddTime <= list[0].endTime))
 				{
-					text19 = "禁止通行";
-					SpeechSynthesizer obj2 = new SpeechSynthesizer
-					{
-						Rate = 1,
-						Volume = 100
-					};
-					text = vehicleNoInfoView.VehicleNo + text19;
-					obj2.Speak(text);
+					vehicleNoInfoView.TrafficStatus = "禁止通行";
+					vehicleNoInfoView.ExeLog = "未在有效期以内";
 				}
-			});
-		}
-		if (IsRelease && MainData.TXIsOpen)
-		{
-			CommonHelper.TXHGInOutUpLoad(tb_Channel.guid, vehicleNoInfoView.AddTime, vehicleNoInfoView.VehicleNo, tb_Channel.ChannelName, tb_Channel.ChannelType, vehicleNoInfoView.ImagePath);
-		}
-		LEDPlay(IsRelease, vehicleNoInfoView);
-		if (this.carRecord != null)
-		{
-			this.carRecord(vehicleNoInfoView);
-		}
-		showVehicleNo(text);
-		goto IL_05b8;
-		IL_05da:
-		if (MainData.DJPT == "中科九州")
-		{
+				else if (MainData.BMDSC)
+				{
+					goto IL_05da;
+				}
+			}
+			else
+			{
+				if (MainData.SDZK)
+				{
+					isrg = true;
+					goto IL_05b8;
+				}
+				if (!MainData.LSCSN)
+				{
+					goto IL_05da;
+				}
+				vehicleNoInfoView.ExeLog = "临时车禁止通行";
+				IsRelease = false;
+			}
+			goto IL_0e30;
+			IL_0e30:
+			if (MainData.dnyybb)
+			{
+				Task.Factory.StartNew(delegate
+				{
+					string text19 = "禁止通行";
+					if (IsRelease)
+					{
+						text19 = "允许通行";
+						SpeechSynthesizer obj = new SpeechSynthesizer
+						{
+							Rate = 1,
+							Volume = 100
+						};
+						text = vehicleNoInfoView.VehicleNo + vehicleNoInfoView.emissionStandard + vehicleNoInfoView.fuelType + text19;
+						obj.Speak(text);
+					}
+					else
+					{
+						text19 = "禁止通行";
+						SpeechSynthesizer obj2 = new SpeechSynthesizer
+						{
+							Rate = 1,
+							Volume = 100
+						};
+						text = vehicleNoInfoView.VehicleNo + text19;
+						obj2.Speak(text);
+					}
+				});
+			}
+			if (IsRelease && MainData.TXIsOpen)
+			{
+				CommonHelper.TXHGInOutUpLoad(tb_Channel.guid, vehicleNoInfoView.AddTime, vehicleNoInfoView.VehicleNo, tb_Channel.ChannelName, tb_Channel.ChannelType, vehicleNoInfoView.ImagePath);
+			}
+			LEDPlay(IsRelease, vehicleNoInfoView);
+			if (this.carRecord != null)
+			{
+				this.carRecord(vehicleNoInfoView);
+			}
+			showVehicleNo(text);
+			goto IL_05b8;
+			IL_05da:
 			if (MainData.DJPT == "中科九州")
 			{
-				string text5 = "A";
-				text5 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
-				string msg = "";
-				string text6 = "";
-				string text7 = "";
-				if (CommonHelper.KangFengV1Verify(text, empty, tb_Channel.ChannelPort, text5, ref msg, ref vehicleNoInfoView))
+				if (MainData.DJPT == "中科九州")
 				{
-					if (MainData.YZTZ)
+					string text5 = "A";
+					text5 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
+					string msg = "";
+					string text6 = "";
+					string text7 = "";
+					if (CommonHelper.KangFengV1Verify(text, empty, tb_Channel.ChannelPort, text5, ref msg, ref vehicleNoInfoView))
 					{
-						if (CommonHelper.weiyouyuan(text, tb_Channel.ChannelType))
+						if (MainData.YZTZ)
+						{
+							if (CommonHelper.weiyouyuan(text, tb_Channel.ChannelType))
+							{
+								text7 = "未上传";
+								text6 = "摆杆通行";
+							}
+							else
+							{
+								text6 = "未摆杆";
+								text7 = "禁止上传";
+								IsRelease = false;
+								vehicleNoInfoView.ExeLog = "未补台账，禁止通行";
+							}
+						}
+						else
 						{
 							text7 = "未上传";
 							text6 = "摆杆通行";
 						}
-						else
-						{
-							text6 = "未摆杆";
-							text7 = "禁止上传";
-							IsRelease = false;
-							vehicleNoInfoView.ExeLog = "未补台账，禁止通行";
-						}
 					}
 					else
 					{
-						text7 = "未上传";
-						text6 = "摆杆通行";
+						text6 = "未摆杆";
+						IsRelease = false;
+						vehicleNoInfoView.ExeLog = msg;
+						if (vehicleNoInfoView.serialNum == null || string.IsNullOrWhiteSpace(vehicleNoInfoView.serialNum))
+						{
+							text7 = "禁止重复上传";
+							goto IL_0e30;
+						}
+						text7 = ((!MainData.barriergate_upload) ? "禁止上传" : "未上传");
 					}
+					if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, msg, text6, text7, ref vehicleNoInfoView))
+					{
+						vehicleNoInfoView.ExeLog = "保存失败";
+						IsRelease = false;
+					}
+				}
+			}
+			else if (MainData.DJPT == "高凌")
+			{
+				string text8 = "0";
+				text8 = tb_Channel.ChannelPort;
+				string msg2 = "";
+				bool isUpload = false;
+				bool isBlacklisted = false;
+				List<tb_car_info> carList = new DataServerContext<tb_car_info>().Current.GetList((tb_car_info it) => it.car_no == vehicleNoInfoView.VehicleNo);
+				if (carList != null && carList.Count > 0 && carList[0].bz == "黑名单")
+				{
+					IsRelease = false;
+					isUpload = true;
+					vehicleNoInfoView.ExeLog = "黑名单禁止通行";
+					vehicleNoInfoView.TrafficStatus = "禁止通行";
+					isBlacklisted = true;
+				}
+				if (!isBlacklisted && !CommonHelper.GLVerify(text, vehicleNoInfoView.licenseColor, text8, ref msg2, ref vehicleNoInfoView))
+				{
+					IsRelease = false;
+					isUpload = true;
+					vehicleNoInfoView.ExeLog = msg2;
+				}
+				if (!MainData.RecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView, isUpload))
+				{
+					IsRelease = false;
+					vehicleNoInfoView.ExeLog = msg2 + ";;保存失败";
+				}
+			}
+			else if (MainData.DJPT == "安车")
+			{
+				string msg3 = "";
+				string text9 = "";
+				string text10 = "";
+				if (CommonHelper.AnCheVerify(text, empty, ref msg3, ref vehicleNoInfoView, tb_Channel.ChannelPort))
+				{
+					text10 = "未上传";
+					text9 = "摆杆通行";
 				}
 				else
 				{
-					text6 = "未摆杆";
+					text10 = "禁止上传";
+					text9 = "未摆杆";
 					IsRelease = false;
-					vehicleNoInfoView.ExeLog = msg;
-					if (vehicleNoInfoView.serialNum == null || string.IsNullOrWhiteSpace(vehicleNoInfoView.serialNum))
-					{
-						text7 = "禁止重复上传";
-						goto IL_0e30;
-					}
-					text7 = ((!MainData.barriergate_upload) ? "禁止上传" : "未上传");
+					vehicleNoInfoView.ExeLog = msg3;
 				}
-				if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, msg, text6, text7, ref vehicleNoInfoView))
+				string text11 = "A";
+				text11 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
+				vehicleNoInfoView.serialNum = MainData.ACEnterpriseID + tb_Channel.ChannelPort + text11 + vehicleNoInfoView.AddTime.ToString("yyMMddHHmmss");
+				if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView.serialNum, text9, text10, ref vehicleNoInfoView))
 				{
 					vehicleNoInfoView.ExeLog = "保存失败";
 					IsRelease = false;
 				}
 			}
-		}
-		else if (MainData.DJPT == "高凌")
-		{
-			string text8 = "0";
-			text8 = tb_Channel.ChannelPort;
-			string msg2 = "";
-			bool isUpload = false;
-			if (!CommonHelper.GLVerify(text, vehicleNoInfoView.licenseColor, text8, ref msg2, ref vehicleNoInfoView))
+			else if (MainData.DJPT == "腾跃")
 			{
-				IsRelease = false;
-				isUpload = true;
-				vehicleNoInfoView.ExeLog = msg2;
-			}
-			if (!MainData.RecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView, isUpload))
-			{
-				IsRelease = false;
-				vehicleNoInfoView.ExeLog = msg2 + ";;保存失败";
-			}
-		}
-		else if (MainData.DJPT == "安车")
-		{
-			string msg3 = "";
-			string text9 = "";
-			string text10 = "";
-			if (CommonHelper.AnCheVerify(text, empty, ref msg3, ref vehicleNoInfoView, tb_Channel.ChannelPort))
-			{
-				text10 = "未上传";
-				text9 = "摆杆通行";
-			}
-			else
-			{
-				text10 = "禁止上传";
-				text9 = "未摆杆";
-				IsRelease = false;
-				vehicleNoInfoView.ExeLog = msg3;
-			}
-			string text11 = "A";
-			text11 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
-			vehicleNoInfoView.serialNum = MainData.ACEnterpriseID + tb_Channel.ChannelPort + text11 + vehicleNoInfoView.AddTime.ToString("yyMMddHHmmss");
-			if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView.serialNum, text9, text10, ref vehicleNoInfoView))
-			{
-				vehicleNoInfoView.ExeLog = "保存失败";
-				IsRelease = false;
-			}
-		}
-		else if (MainData.DJPT == "腾跃")
-		{
-			int num = -1;
-			num = ((!(tb_Channel.ChannelType == "入口")) ? MainData.TYExitChannel : MainData.TYEnterChannel);
-			string msg4 = "";
-			bool isJS = false;
-			if (CommonHelper.TYVerify(text, empty, num, text3, ref msg4))
-			{
-				IsRelease = true;
-				isJS = true;
-			}
-			else
-			{
-				IsRelease = false;
-				vehicleNoInfoView.ExeLog = msg4;
-			}
-			if (!MainData.RecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, null, isUpload: false, "", isJS))
-			{
-				vehicleNoInfoView.ExeLog = "保存失败";
-				IsRelease = false;
-			}
-		}
-		else if (MainData.DJPT == "消纳场")
-		{
-			string text12 = "1";
-			text12 = ((!(tb_Channel.ChannelType == "入口")) ? "2" : "1");
-			string msg5 = "";
-			if (CommonHelper.XNCVerify(text, empty, tb_Device.deviceId, text12, ref msg5))
-			{
-				if (MainData.RecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, null))
+				int num = -1;
+				num = ((!(tb_Channel.ChannelType == "入口")) ? MainData.TYExitChannel : MainData.TYEnterChannel);
+				string msg4 = "";
+				bool isJS = false;
+				if (CommonHelper.TYVerify(text, empty, num, text3, ref msg4))
 				{
 					IsRelease = true;
+					isJS = true;
 				}
 				else
 				{
-					vehicleNoInfoView.ExeLog = "保存失败！禁止通行";
+					IsRelease = false;
+					vehicleNoInfoView.ExeLog = msg4;
+				}
+				if (!MainData.RecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, null, isUpload: false, "", isJS))
+				{
+					vehicleNoInfoView.ExeLog = "保存失败";
 					IsRelease = false;
 				}
 			}
-			else
+			else if (MainData.DJPT == "消纳场")
 			{
-				vehicleNoInfoView.ExeLog = msg5;
-				IsRelease = false;
+				string text12 = "1";
+				text12 = ((!(tb_Channel.ChannelType == "入口")) ? "2" : "1");
+				string msg5 = "";
+				if (CommonHelper.XNCVerify(text, empty, tb_Device.deviceId, text12, ref msg5))
+				{
+					if (MainData.RecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, null))
+					{
+						IsRelease = true;
+					}
+					else
+					{
+						vehicleNoInfoView.ExeLog = "保存失败！禁止通行";
+						IsRelease = false;
+					}
+				}
+				else
+				{
+					vehicleNoInfoView.ExeLog = msg5;
+					IsRelease = false;
+				}
 			}
+			else if (MainData.DJPT == "天地人车")
+			{
+				string msg6 = "";
+				string text13 = "";
+				string text14 = "";
+				if (CommonHelper.tdrcCheVerify(text, empty, ref msg6, ref vehicleNoInfoView))
+				{
+					text14 = "未上传";
+					text13 = "摆杆通行";
+				}
+				else
+				{
+					text14 = "禁止上传";
+					text13 = "未摆杆";
+					IsRelease = false;
+					vehicleNoInfoView.ExeLog = msg6;
+				}
+				string text15 = "A";
+				text15 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
+				vehicleNoInfoView.serialNum = MainData.tdrcOrgan + tb_Channel.ChannelPort + text15 + DateTime.Now.ToString("yyMMddHHmmss");
+				if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView.serialNum, text13, text14, ref vehicleNoInfoView))
+				{
+					vehicleNoInfoView.ExeLog = "保存失败";
+					IsRelease = false;
+				}
+			}
+			else if (MainData.DJPT == "信阳")
+			{
+				string msg7 = "";
+				string text16 = "";
+				string text17 = "";
+				if (CommonHelper.xyCheVerify(text, empty, ref msg7, ref vehicleNoInfoView))
+				{
+					text17 = "未上传";
+					text16 = "摆杆通行";
+				}
+				else
+				{
+					text17 = "禁止上传";
+					text16 = "未摆杆";
+					IsRelease = false;
+					vehicleNoInfoView.ExeLog = msg7;
+				}
+				string text18 = "A";
+				text18 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
+				vehicleNoInfoView.serialNum = MainData.xyOrgan + tb_Channel.ChannelPort + text18 + DateTime.Now.ToString("yyMMddHHmmss");
+				if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView.serialNum, text16, text17, ref vehicleNoInfoView))
+				{
+					vehicleNoInfoView.ExeLog = "保存失败";
+					IsRelease = false;
+				}
+			}
+			goto IL_0e30;
+			IL_05b8:
+			if (isrg)
+			{
+				isrg = false;
+				OutSystem.AddOut(vehicleNoInfoView);
+			}
+			goto IL_0e24;
+			IL_0e24:
+			licensePlate = "";
 		}
-		else if (MainData.DJPT == "天地人车")
+		finally
 		{
-			string msg6 = "";
-			string text13 = "";
-			string text14 = "";
-			if (CommonHelper.tdrcCheVerify(text, empty, ref msg6, ref vehicleNoInfoView))
-			{
-				text14 = "未上传";
-				text13 = "摆杆通行";
-			}
-			else
-			{
-				text14 = "禁止上传";
-				text13 = "未摆杆";
-				IsRelease = false;
-				vehicleNoInfoView.ExeLog = msg6;
-			}
-			string text15 = "A";
-			text15 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
-			vehicleNoInfoView.serialNum = MainData.tdrcOrgan + tb_Channel.ChannelPort + text15 + DateTime.Now.ToString("yyMMddHHmmss");
-			if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView.serialNum, text13, text14, ref vehicleNoInfoView))
-			{
-				vehicleNoInfoView.ExeLog = "保存失败";
-				IsRelease = false;
-			}
+			Marshal.FreeHGlobal(lpOuter.pBuffer1);
+			Marshal.FreeHGlobal(lpOuter.pBuffer2);
+			Marshal.FreeHGlobal(lpOuter.pBuffer3);
+			Marshal.FreeHGlobal(lpOuter.pBuffer4);
+			Marshal.FreeHGlobal(lpOuter.pBuffer5);
 		}
-		else if (MainData.DJPT == "信阳")
-		{
-			string msg7 = "";
-			string text16 = "";
-			string text17 = "";
-			if (CommonHelper.xyCheVerify(text, empty, ref msg7, ref vehicleNoInfoView))
-			{
-				text17 = "未上传";
-				text16 = "摆杆通行";
-			}
-			else
-			{
-				text17 = "禁止上传";
-				text16 = "未摆杆";
-				IsRelease = false;
-				vehicleNoInfoView.ExeLog = msg7;
-			}
-			string text18 = "A";
-			text18 = ((!(tb_Channel.ChannelType == "入口")) ? "B" : "A");
-			vehicleNoInfoView.serialNum = MainData.xyOrgan + tb_Channel.ChannelPort + text18 + DateTime.Now.ToString("yyMMddHHmmss");
-			if (!MainData.KaiFengRecordSave(car_image, text3, text, empty, tb_Channel.ChannelType, tb_Channel.id, tb_Device.id, tb_Channel.ChannelPort, vehicleNoInfoView.serialNum, text16, text17, ref vehicleNoInfoView))
-			{
-				vehicleNoInfoView.ExeLog = "保存失败";
-				IsRelease = false;
-			}
-		}
-		goto IL_0e30;
-		IL_05b8:
-		if (isrg)
-		{
-			isrg = false;
-			OutSystem.AddOut(vehicleNoInfoView);
-		}
-		goto IL_0e24;
-		IL_0e24:
-		licensePlate = "";
 	}
 
 	public void barrierGate(byte type)
@@ -2179,8 +2243,7 @@ public class UserControlHaiKang : UserControl, IVideoMngInterface
 									{
 										DateTime start = DateTime.Now.AddSeconds(-60.0);
 										DateTime end = DateTime.Now.AddSeconds(60.0);
-										string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-										string sVideoFileName = MainData.strImageDir + "\\" + text + ".mp4";
+										string sVideoFileName = Path.Combine(MainData.strImageDir, DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".mp4");
 										Thread.Sleep(60000);
 										new HKSDK();
 										MainData.hKLXJ.Add(start, end, Convert.ToInt32(zpjList.ChannelID), value, sVideoFileName);

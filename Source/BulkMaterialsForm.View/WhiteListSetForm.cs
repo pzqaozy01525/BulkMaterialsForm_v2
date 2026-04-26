@@ -96,7 +96,7 @@ public class WhiteListSetForm : Form
 				textBox3.Text = tb_car_info2.phone;
 				comboBox1.SelectedItem = tb_car_info2.bz;
 				car_no = tb_car_info2.car_no;
-				if (tb_car_info2.startTime >= new DateTime(1997, 1, 1))
+				if (tb_car_info2.startTime >= DateTime.MinValue)
 				{
 					dateTimePicker1.Value = tb_car_info2.startTime;
 				}
@@ -104,7 +104,7 @@ public class WhiteListSetForm : Form
 				{
 					dateTimePicker1.Value = DateTime.Now;
 				}
-				if (tb_car_info2.endTime >= new DateTime(1997, 1, 1))
+				if (tb_car_info2.endTime >= DateTime.MinValue)
 				{
 					dateTimePicker2.Value = tb_car_info2.endTime;
 				}
@@ -282,13 +282,11 @@ public class WhiteListSetForm : Form
 		this.bar2.OptionsBar.MultiLine = true;
 		this.bar2.OptionsBar.UseWholeRow = true;
 		this.bar2.Text = "Main menu";
-		this.barButtonItem2.TabIndex = 1;
 		this.barButtonItem2.Caption = "保存";
 		this.barButtonItem2.Id = 96;
 		this.barButtonItem2.ImageOptions.Image = BulkMaterialsForm.Properties.Resources.apply_32x322;
 		this.barButtonItem2.Name = "barButtonItem2";
 		this.barButtonItem2.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(barButtonItem2_ItemClick);
-		this.barButtonItem4.TabIndex = 2;
 		this.barButtonItem4.Caption = "关闭";
 		this.barButtonItem4.Id = 98;
 		this.barButtonItem4.ImageOptions.Image = BulkMaterialsForm.Properties.Resources.cancel_32x32;

@@ -171,13 +171,13 @@ public class SnapSetForm : Form
 		{
 			MainData.init_Sdk_HaiKang();
 			CHCNetSDK.NET_DVR_USER_LOGIN_INFO pLoginInfo = default(CHCNetSDK.NET_DVR_USER_LOGIN_INFO);
-			byte[] bytes = Encoding.Default.GetBytes(textBox1.Text);
+			byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(textBox1.Text);
 			pLoginInfo.sDeviceAddress = new byte[129];
 			bytes.CopyTo(pLoginInfo.sDeviceAddress, 0);
-			byte[] bytes2 = Encoding.Default.GetBytes(textBox2.Text);
+			byte[] bytes2 = Encoding.GetEncoding("GBK").GetBytes(textBox2.Text);
 			pLoginInfo.sUserName = new byte[64];
 			bytes2.CopyTo(pLoginInfo.sUserName, 0);
-			byte[] bytes3 = Encoding.Default.GetBytes(textBox3.Text);
+			byte[] bytes3 = Encoding.GetEncoding("GBK").GetBytes(textBox3.Text);
 			pLoginInfo.sPassword = new byte[64];
 			bytes3.CopyTo(pLoginInfo.sPassword, 0);
 			pLoginInfo.wPort = 8000;

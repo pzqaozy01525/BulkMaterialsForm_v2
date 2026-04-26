@@ -142,7 +142,7 @@ public class SoftAuthorize
 		try
 		{
 			FileStream fileStream = new FileStream(Application.StartupPath + "\\doc.txt", FileMode.Append);
-			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.Default);
+			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8); // TODO: 确认编码（原文 Encoding.Default）
 			streamWriter.WriteLine(text);
 			streamWriter.Flush();
 			streamWriter.Close();

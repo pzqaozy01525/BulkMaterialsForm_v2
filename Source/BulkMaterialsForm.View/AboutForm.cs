@@ -116,7 +116,7 @@ public class AboutForm : Form
 			lblStatusValue.ForeColor = Color.Gray;
 			lblCompanyValue.Text = "默认运维公司";
 			lblPhoneValue.Text = "400-888-8888";
-			Console.WriteLine("AboutForm加载信息失败: " + ex.Message);
+			LogSave.SaveExeLog($"[AboutForm] 加载信息失败: {ex.Message}");
 		}
 	}
 
@@ -138,7 +138,7 @@ public class AboutForm : Form
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("读取运维公司信息失败: " + ex.Message);
+			LogSave.SaveExeLog($"[AboutForm] 读取运维公司信息失败: {ex.Message}");
 		}
 		return "环保科技有限公司";
 	}
@@ -161,7 +161,7 @@ public class AboutForm : Form
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine("读取运维电话信息失败: " + ex.Message);
+			LogSave.SaveExeLog($"[AboutForm] 读取运维电话信息失败: {ex.Message}");
 		}
 		return "400-888-8888";
 	}

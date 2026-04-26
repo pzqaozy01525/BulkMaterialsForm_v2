@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using BulkMaterialsForm.Model.View;
 
@@ -21,9 +22,33 @@ public class TCPSeerver
 
 	private static int port = 14739;
 
+	private static readonly CancellationTokenSource _cts = new CancellationTokenSource();
+
 	public static List<tcpModel> tcpModels = new List<tcpModel>();
 
 	public static event CarTcpRecord carTcpRecord;
+
+	public static void StopServer()
+	{
+		_cts.Cancel();
+		try
+		{
+			tcpListener?.Stop();
+		}
+		catch (Exception ex)
+		{
+			LogSave.XHTcpLog($"[TCPSeerver] 停止服务异常: {ex.Message}");
+		}
+		foreach (tcpModel item in tcpModels.ToList())
+		{
+			try
+			{
+				item.tcpClient?.Close();
+			}
+			catch { }
+		}
+		tcpModels.Clear();
+	}
 
 	public static async Task StartServerAsync()
 	{
@@ -31,34 +56,49 @@ public class TCPSeerver
 		{
 			tcpListener = new TcpListener(IPAddress.Parse(MainData.localhostIP), port);
 			tcpListener.Start();
-			Console.WriteLine($"Server started on port {port}.");
-			while (true)
+			LogSave.XHTcpLog($"[TCPSeerver] 服务启动，端口: {port}");
+			while (!_cts.Token.IsCancellationRequested)
 			{
-				TcpClient client = await tcpListener.AcceptTcpClientAsync();
-				tcpModel tcpModel2 = tcpModels.FirstOrDefault((tcpModel it) => it.ipAndPort == client.Client.RemoteEndPoint.ToString());
-				if (tcpModel2 == null)
+				try
 				{
-					LogSave.XHTcpLog(DateTime.Now.ToString() + " 添加设备==" + client.Client.RemoteEndPoint.ToString());
-					tcpModel2 = new tcpModel
+					TcpClient client = await tcpListener.AcceptTcpClientAsync();
+					tcpModel tcpModel2 = tcpModels.FirstOrDefault((tcpModel it) => it.ipAndPort == client.Client.RemoteEndPoint.ToString());
+					if (tcpModel2 == null)
 					{
-						tcpClient = client,
-						ipAndPort = client.Client.RemoteEndPoint.ToString()
-					};
-					tcpModels.Add(tcpModel2);
+						LogSave.XHTcpLog(DateTime.Now.ToString() + " 添加设备==" + client.Client.RemoteEndPoint.ToString());
+						tcpModel2 = new tcpModel
+						{
+							tcpClient = client,
+							ipAndPort = client.Client.RemoteEndPoint.ToString()
+						};
+						tcpModels.Add(tcpModel2);
+					}
+					else
+					{
+						LogSave.TCPLog(DateTime.Now.ToString() + " 已存在" + client.Client.RemoteEndPoint.ToString());
+						tcpModel2.tcpClient = client;
+					}
+					HandleClientAsync(client);
+					string text = (client.Client.RemoteEndPoint as IPEndPoint).Address.ToString();
+					LogSave.XHTcpLog(DateTime.Now.ToString() + "TCP连接:" + text);
 				}
-				else
+				catch (OperationCanceledException)
 				{
-					LogSave.TCPLog(DateTime.Now.ToString() + " 已存在" + client.Client.RemoteEndPoint.ToString());
-					tcpModel2.tcpClient = client;
+					break;
 				}
-				HandleClientAsync(client);
-				string text = (client.Client.RemoteEndPoint as IPEndPoint).Address.ToString();
-				LogSave.XHTcpLog(DateTime.Now.ToString() + "TCP连接:" + text);
+				catch (Exception ex)
+				{
+					LogSave.XHTcpLog($"[TCPSeerver] 接受连接异常: {ex.Message}");
+					await Task.Delay(1000, _cts.Token);
+				}
 			}
+		}
+		catch (OperationCanceledException)
+		{
 		}
 		catch (Exception ex)
 		{
-			LogSave.XHTcpLog(DateTime.Now.ToString() + "StartServerAsync异常" + ex.ToString());
+			LogSave.XHTcpLog($"[TCPSeerver] StartServerAsync异常: {ex.ToString()}");
 		}
 	}
 
@@ -69,7 +109,7 @@ public class TCPSeerver
 		try
 		{
 			int count;
-			while ((count = await stream.ReadAsync(bytes, 0, bytes.Length)) != 0)
+			while ((count = await stream.ReadAsync(bytes, 0, bytes.Length, _cts.Token)) != 0)
 			{
 				string text = Encoding.UTF8.GetString(bytes, 0, count);
 				IPAddress address = (client.Client.RemoteEndPoint as IPEndPoint).Address;
@@ -112,13 +152,16 @@ public class TCPSeerver
 				}
 			}
 		}
+		catch (OperationCanceledException)
+		{
+		}
 		catch (Exception ex)
 		{
-			Console.WriteLine(ex.Message);
+			LogSave.XHTcpLog($"[TCPSeerver.HandleClient] 处理异常: {ex.Message}");
 		}
 		finally
 		{
-			client.Close();
+			try { client.Close(); } catch { }
 		}
 	}
 
@@ -130,8 +173,9 @@ public class TCPSeerver
 			byte[] bytes = Encoding.UTF8.GetBytes(message);
 			stream.Write(bytes, 0, bytes.Length);
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.XHTcpLog($"[TCPSeerver.SendData] 发送异常: {ex.Message}");
 		}
 	}
 }

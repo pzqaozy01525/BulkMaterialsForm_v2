@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -124,7 +125,7 @@ public class ExchangeBoard
 			}
 		};
 		string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-		string sVideoFileName = MainData.strImageDir + "\\" + text + ".mp4";
+		string sVideoFileName = Path.Combine(MainData.strImageDir, text + ".mp4");
 		int num = CHCNetSDK.NET_DVR_GetFileByTime_V40(m_lUserID, sVideoFileName, ref pDownloadCond);
 		if (num < 0)
 		{

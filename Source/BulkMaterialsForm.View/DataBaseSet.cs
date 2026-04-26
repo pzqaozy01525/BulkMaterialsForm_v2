@@ -167,7 +167,7 @@ public class DataBaseSet : Form
 	public static void CreateDatebase(string path, SqlCommand cmd)
 	{
 		cmd.CommandTimeout = 600;
-		using StreamReader streamReader = new StreamReader(path, Encoding.Default);
+		using StreamReader streamReader = new StreamReader(path, Encoding.GetEncoding("GBK")); // TODO: 确认编码（原文 Encoding.Default）
 		StringBuilder stringBuilder = new StringBuilder();
 		string text;
 		while ((text = streamReader.ReadLine()) != null)
@@ -247,7 +247,7 @@ public class DataBaseSet : Form
 		sqlConnection.Open();
 		using SqlCommand sqlCommand = new SqlCommand(cmdText, sqlConnection);
 		sqlCommand.ExecuteNonQuery();
-		Console.WriteLine("数据库备份成功。");
+			LogSave.SaveExeLog($"[DataBaseSet] 数据库备份成功: {fileName}");
 	}
 
 	private void barButtonItem7_ItemClick(object sender, ItemClickEventArgs e)
@@ -265,37 +265,32 @@ public class DataBaseSet : Form
 			string cmdText = "RESTORE DATABASE " + textBox9.Text + " FROM DISK = '" + fileName + "' WITH REPLACE";
 			string text = "Provider=SQLOLEDB;Server=" + MainData.server + "; Database=Master; User ID=" + MainData.uid + "; Password=" + MainData.pwd + ";Connect Timeout=30";
 			Kill_DBConn(text, MainData.database);
-			using OleDbConnection oleDbConnection = new OleDbConnection(text);
 			SqlConnection.ClearAllPools();
 			OleDbConnection.ReleaseObjectPool();
+			using OleDbConnection oleDbConnection = new OleDbConnection(text);
 			oleDbConnection.Open();
-			OleDbCommand oleDbCommand = new OleDbCommand(cmdText, oleDbConnection);
-			try
-			{
-				oleDbCommand.CommandTimeout = 60;
-				oleDbCommand.ExecuteNonQuery();
-				oleDbCommand.Dispose();
-				oleDbConnection.Close();
-				oleDbConnection.Dispose();
-				Application.Exit();
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
+			using OleDbCommand oleDbCommand = new OleDbCommand(cmdText, oleDbConnection);
+			oleDbCommand.CommandTimeout = 60;
+			oleDbCommand.ExecuteNonQuery();
+			LogSave.SaveExeLog($"[DataBaseSet] 数据库恢复成功: {textBox9.Text}");
+			MessageBox.Show("数据库恢复成功！程序将关闭。", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			Application.Exit();
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[DataBaseSet] 数据库恢复失败: {ex.Message}");
+			MessageBox.Show("数据库恢复失败: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 	}
 
 	private void Kill_DBConn(string sqlConnectString, string parkDbName)
 	{
-		string cmdText = "SELECT spid FROM sysprocesses ,sysdatabases WHERE sysprocesses.dbid=sysdatabases.dbid AND sysdatabases.Name='" + parkDbName + "'";
+		string cmdText = "SELECT spid FROM sysprocesses ,sysdatabases WHERE sysprocesses.dbid=sysdatabases.dbid AND sysdatabases.Name=@dbName";
 		using OleDbConnection oleDbConnection = new OleDbConnection(sqlConnectString);
 		oleDbConnection.Open();
 		DataSet dataSet = new DataSet();
 		OleDbCommand oleDbCommand = new OleDbCommand(cmdText, oleDbConnection);
+		oleDbCommand.Parameters.AddWithValue("@dbName", parkDbName);
 		new OleDbDataAdapter(oleDbCommand).Fill(dataSet);
 		foreach (DataRow row in dataSet.Tables[0].Rows)
 		{
@@ -304,8 +299,9 @@ public class DataBaseSet : Form
 				oleDbCommand.CommandText = "KILL " + row[0].ToString();
 				oleDbCommand.ExecuteNonQuery();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				LogSave.SaveExeLog($"[DataBaseSet] Kill SPID 失败: {ex.Message}");
 			}
 		}
 		oleDbCommand.Dispose();

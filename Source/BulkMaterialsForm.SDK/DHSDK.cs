@@ -3,6 +3,7 @@
 // Type: BulkMaterialsForm.SDK.DHSDK
 
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using BulkMaterialsForm.DH;
@@ -95,7 +96,7 @@ public class DHSDK
 				lastError.Equals("句柄无效");
 			}
 			string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-			string sVideoFileName = MainData.strImageDir + "\\" + text + ".mp4";
+			string sVideoFileName = Path.Combine(MainData.strImageDir, text + ".mp4");
 			NET_IN_DOWNLOAD_BY_DATA_TYPE pstInParam = new NET_IN_DOWNLOAD_BY_DATA_TYPE
 			{
 				dwSize = (uint)Marshal.SizeOf(typeof(NET_CTRL_OPEN_STROBE)),
@@ -148,7 +149,7 @@ public class DHSDK
 			for (int i = 0; i < 3; i++)
 			{
 				string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-				string strImageFile = MainData.strImageDir + "\\" + text + "zp.jpg";
+				string strImageFile = Path.Combine(MainData.strImageDir, text + "zp.jpg");
 				NET_IN_SNAP_PIC_TO_FILE_PARAM inParam = default(NET_IN_SNAP_PIC_TO_FILE_PARAM);
 				NET_SNAP_PARAMS stuParam = new NET_SNAP_PARAMS
 				{

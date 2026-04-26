@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using BulkMaterialsForm.Help;
 using BulkMaterialsForm.Manager;
 using BulkMaterialsForm.Model;
 using BulkMaterialsForm.Model.View;
@@ -122,7 +123,7 @@ public class FKTcp : IDisposable
 			Buff[num++] = (byte)((TextContext[i].TextColor >> 8) & 0xFF);
 			Buff[num++] = (byte)((TextContext[i].TextColor >> 16) & 0xFF);
 			Buff[num++] = (byte)((TextContext[i].TextColor >> 24) & 0xFF);
-			byte[] bytes = Encoding.Default.GetBytes(TextContext[i].Text);
+			byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(TextContext[i].Text);
 			if (num + bytes.Length >= 255)
 			{
 				return Buff;
@@ -141,7 +142,7 @@ public class FKTcp : IDisposable
 				Buff[num++] = 13;
 			}
 		}
-		byte[] bytes2 = Encoding.Default.GetBytes(VoiceText);
+		byte[] bytes2 = Encoding.GetEncoding("GBK").GetBytes(VoiceText);
 		if (bytes2.Length != 0)
 		{
 			Buff[num++] = 10;
@@ -291,15 +292,18 @@ public class FKTcp : IDisposable
 		{
 			lock (_poolLock)
 			{
-				CloseSocket(socket);
-				_socketPool.Remove(host);
-				_lastActiveTime.Remove(host);
+				if (socket != null)
+				{
+					CloseSocket(socket);
+					_socketPool.Remove(host);
+					_lastActiveTime.Remove(host);
+				}
 			}
-			BulkMaterialsForm.Help.LogSave.SaveExeLog($"[FKTcp] 发送失败，{host}:8800，{ex.Message}");
+			LogSave.SaveExeLog($"[FKTcp] Socket发送失败，{host}:8800，{ex.Message}");
 		}
 		catch (Exception ex2)
 		{
-			BulkMaterialsForm.Help.LogSave.SaveExeLog($"[FKTcp] 异常，{host}:8800，{ex2.Message}");
+			LogSave.SaveExeLog($"[FKTcp] 发送异常，{host}:8800，{ex2.Message}");
 		}
 	}
 

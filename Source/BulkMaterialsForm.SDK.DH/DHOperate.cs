@@ -3,6 +3,7 @@
 // Type: BulkMaterialsForm.SDK.DH.DHOperate
 
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using BulkMaterialsForm.DH;
@@ -48,7 +49,7 @@ public class DHOperate
 			{
 				RecordId = Id;
 				string text = DateTime.Now.ToLocalTime().ToString("yyyyMMddHHmmssfff");
-				string strImageFile = MainData.strImageDir + "\\" + text + "zp.jpg";
+				string strImageFile = Path.Combine(MainData.strImageDir, text + "zp.jpg");
 				NET_IN_SNAP_PIC_TO_FILE_PARAM inParam = default(NET_IN_SNAP_PIC_TO_FILE_PARAM);
 				NET_SNAP_PARAMS stuParam = new NET_SNAP_PARAMS
 				{

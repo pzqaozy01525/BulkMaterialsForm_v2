@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using BulkMaterialsForm.Help;
 using BulkMaterialsForm.Manager;
 using BulkMaterialsForm.Model;
 using BulkMaterialsForm.Properties;
@@ -189,17 +190,7 @@ public class FDLYDJXForm : Form
 
 	private void ShowMessage(string msg)
 	{
-		if (base.InvokeRequired)
-		{
-			Invoke((Action)delegate
-			{
-				MessageBox.Show(msg);
-			});
-		}
-		else
-		{
-			MessageBox.Show(msg);
-		}
+		FormHelper.ShowMessage(this, msg);
 	}
 
 	public void InitData()

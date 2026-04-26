@@ -287,7 +287,7 @@ public class YB_SDK
 					{
 						text2 = "\\C3" + text2;
 					}
-					Encoding.Default.GetBytes(text2.Trim());
+					Encoding.GetEncoding("GBK").GetBytes(text2.Trim());
 					header.DataLen = text2.Length;
 					Led5kstaticArea led5kstaticArea = new Led5kstaticArea();
 					led5kstaticArea.header = header;

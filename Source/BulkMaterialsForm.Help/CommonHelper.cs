@@ -32,7 +32,7 @@ public class CommonHelper
 			new XNCResultModel();
 			string value = JsonConvert.SerializeObject(values);
 			RestClient restClient = new RestClient(url);
-			restClient.Timeout = -1;
+			restClient.Timeout = 30000;
 			RestRequest restRequest = new RestRequest(Method.POST);
 			string text = DateTimeToStamp(DateTime.Now).ToString();
 			restRequest.AddHeader("api-timestamp", text);
@@ -63,7 +63,7 @@ public class CommonHelper
 		dictionary.Add("color", licenseColor);
 		dictionary.Add("flag", flag);
 		LogSave.XNCLog(DateTime.Now.ToString() + "消纳场验证上传" + JsonConvert.SerializeObject(dictionary));
-		XNCResultModel xNCResultModel = PoleXNCResultModel("http://42.236.61.123:8802/translator/api/disposalInOutVehicle/pole", MainData.XNCKEY, MainData.XNCSecret, dictionary);
+		XNCResultModel xNCResultModel = PoleXNCResultModel(MainData.XNCServerUrl + MainData.XNCPoleEndpoint, MainData.XNCKEY, MainData.XNCSecret, dictionary);
 		LogSave.XNCLog(DateTime.Now.ToString() + "消纳场验证上传返回" + JsonConvert.SerializeObject(flag2));
 		if (xNCResultModel != null && xNCResultModel.code == 200)
 		{
@@ -91,7 +91,7 @@ public class CommonHelper
 		string value = JsonConvert.SerializeObject(values);
 		RestClient obj = new RestClient(url)
 		{
-			Timeout = -1
+			Timeout = 30000
 		};
 		RestRequest restRequest = new RestRequest(Method.POST);
 		LogSave.Log(DateTime.Now.ToString() + url);
@@ -219,7 +219,7 @@ public class CommonHelper
 	public static bool weiyouyuan(string cph, string inout)
 	{
 		inout = ((!(inout == "入口")) ? "out" : "in");
-		Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(WYYServer("http://fskbtz.weiyouyuan.com.cn/cp/get_carInfo_tz.ashx?cph=" + cph + "&inout=" + inout));
+		Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(WYYServer(MainData.WYYServerUrl + "/cp/get_carInfo_tz.ashx?cph=" + cph + "&inout=" + inout));
 		if (dictionary != null && dictionary.ContainsKey("result"))
 		{
 			if (dictionary["result"].Equals("1"))
@@ -236,11 +236,11 @@ public class CommonHelper
 		try
 		{
 			LogSave.TZLog(DateTime.Now.ToString() + "台账上传" + url);
-			RestClient obj = new RestClient(url)
-			{
-				Timeout = -1
-			};
-			RestRequest restRequest = new RestRequest(Method.GET);
+		RestClient obj = new RestClient(url)
+		{
+			Timeout = 30000
+		};
+		RestRequest restRequest = new RestRequest(Method.GET);
 			restRequest.AddHeader("Content-Type", "application/json");
 			IRestResponse restResponse = obj.Execute(restRequest);
 			if (restResponse != null)
@@ -296,27 +296,22 @@ public class CommonHelper
 		};
 	}
 
-	public static Dictionary<string, object> GetKaiFengV1ResultModel(string url, object values, string token = "")
+	public static Dictionary<string, object> PostJson(string url, object values, string token = "", Action<string> logUpload = null, Action<string> logDownload = null)
 	{
 		try
 		{
-			string text = JsonConvert.SerializeObject(values);
-			LogSave.KaiFengV1(DateTime.Now.ToString() + url + "上传" + text);
-			RestClient obj = new RestClient(url)
-			{
-				Timeout = -1
-			};
+			string json = JsonConvert.SerializeObject(values);
+			logUpload?.Invoke(DateTime.Now.ToString() + url + "上传" + json);
+			RestClient obj = new RestClient(url) { Timeout = 30000 };
 			RestRequest restRequest = new RestRequest(Method.POST);
 			restRequest.AddHeader("Content-Type", "application/json");
 			if (!string.IsNullOrWhiteSpace(token))
-			{
 				restRequest.AddHeader("token", token);
-			}
-			restRequest.AddParameter("application/json", text, ParameterType.RequestBody);
+			restRequest.AddParameter("application/json", json, ParameterType.RequestBody);
 			IRestResponse restResponse = obj.Execute(restRequest);
 			if (restResponse != null)
 			{
-				LogSave.KaiFengV1(DateTime.Now.ToString() + url + "返回" + restResponse.Content);
+				logDownload?.Invoke(DateTime.Now.ToString() + url + "返回" + restResponse.Content);
 				return JsonConvert.DeserializeObject<Dictionary<string, object>>(restResponse.Content);
 			}
 			return null;
@@ -327,41 +322,23 @@ public class CommonHelper
 		}
 	}
 
+	public static Dictionary<string, object> GetKaiFengV1ResultModel(string url, object values, string token = "")
+	{
+		return PostJson(url, values, token,
+			logUpload: LogSave.KaiFengV1,
+			logDownload: LogSave.KaiFengV1);
+	}
+
 	public static Dictionary<string, object> GetAnCheV1ResultModel(string url, object values, string token = "")
 	{
-		try
-		{
-			string value = JsonConvert.SerializeObject(values);
-			RestClient obj = new RestClient(url)
-			{
-				Timeout = -1
-			};
-			RestRequest restRequest = new RestRequest(Method.POST);
-			restRequest.AddHeader("Content-Type", "application/json");
-			if (!string.IsNullOrWhiteSpace(token))
-			{
-				restRequest.AddHeader("token", token);
-			}
-			restRequest.AddParameter("application/json", value, ParameterType.RequestBody);
-			IRestResponse restResponse = obj.Execute(restRequest);
-			if (restResponse != null)
-			{
-				LogSave.AnCheV1(DateTime.Now.ToString() + url + "返回" + restResponse.Content);
-				return JsonConvert.DeserializeObject<Dictionary<string, object>>(restResponse.Content);
-			}
-			return null;
-		}
-		catch (Exception)
-		{
-			return null;
-		}
+		return PostJson(url, values, token, null, LogSave.AnCheV1);
 	}
 
 	public static TYHttpResultModel GetTYData(string url, Dictionary<string, object> values)
 	{
 		JsonConvert.SerializeObject(values);
 		RestClient restClient = new RestClient(url);
-		restClient.Timeout = -1;
+		restClient.Timeout = 30000;
 		RestRequest restRequest = new RestRequest(Method.POST);
 		restRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 		foreach (string key in values.Keys)
@@ -476,10 +453,26 @@ public class CommonHelper
 						dictionary2 = JsonConvert.DeserializeObject<Dictionary<string, object>>(dictionary2["data"].ToString());
 						if (dictionary2 != null)
 						{
-							msg = JsonConvert.SerializeObject(dictionary2);
+							if (dictionary2.ContainsKey("fuelType"))
+							{
+								vehicleNoInfoView.fuelType = GetFuelType(dictionary2["fuelType"].ToString());
+							}
+							if (dictionary2.ContainsKey("standard"))
+							{
+								vehicleNoInfoView.emissionStandard = GetEmissionStandard(dictionary2["standard"].ToString());
+							}
 							if (dictionary2.ContainsKey("isPass") && dictionary2.ContainsKey("passMessage") && dictionary2["isPass"].ToString().Equals("1"))
 							{
-								return true;
+								msg = dictionary2["passMessage"].ToString();
+								result = true;
+							}
+							else if (dictionary2.ContainsKey("passMessage"))
+							{
+								msg = dictionary2["passMessage"].ToString();
+							}
+							else
+							{
+								msg = "车辆禁止通行！";
 							}
 						}
 						else
@@ -648,11 +641,6 @@ public class CommonHelper
 			msg = "环保局平台异常，请联系环保局！";
 		}
 		return result;
-	}
-
-	public static bool AnGetAuthorizationOrg()
-	{
-		return false;
 	}
 
 	public static bool AnCheVerify(string license, string licenseColor, ref string msg, ref VehicleNoInfoView vehicleNoInfoView, string gateCodeB = "")
@@ -1080,7 +1068,11 @@ public class CommonHelper
 						{
 							vehicleNoInfoView.emissionStandard = GetEmissionStandard(dictionary2["emissionStandard"].ToString());
 						}
-						if (dictionary2.ContainsKey("fueltype"))
+						if (dictionary2.ContainsKey("fuelType"))
+						{
+							vehicleNoInfoView.fuelType = GetFuelType(dictionary2["fuelType"].ToString());
+						}
+						else if (dictionary2.ContainsKey("fueltype"))
 						{
 							vehicleNoInfoView.fuelType = GetFuelType(dictionary2["fueltype"].ToString());
 						}
@@ -1242,11 +1234,12 @@ public class CommonHelper
 				dictionary.Add("value", dictionary2);
 				LogSave.AnCheV1(DateTime.Now.ToString() + "道闸信息请求" + JsonConvert.SerializeObject(dictionary));
 				Dictionary<string, object> anCheV1ResultModel = GetAnCheV1ResultModel(MainData.tdrcUrl + "/restapi/transportControl/put_data", dictionary);
-				result = anCheV1ResultModel != null && (anCheV1ResultModel["code"].ToString().Equals("200") || (dictionary2.ContainsKey("status") && false));
+				result = anCheV1ResultModel != null && anCheV1ResultModel["code"].ToString().Equals("200");
 			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.AnCheV1("tdrcGateStatusReport异常: " + ex.Message);
 			result = false;
 		}
 		return result;
@@ -1316,7 +1309,11 @@ public class CommonHelper
 						{
 							vehicleNoInfoView.emissionStandard = GetEmissionStandard(dictionary2["emissionStandard"].ToString());
 						}
-						if (dictionary2.ContainsKey("fueltype"))
+						if (dictionary2.ContainsKey("fuelType"))
+						{
+							vehicleNoInfoView.fuelType = GetFuelType(dictionary2["fuelType"].ToString());
+						}
+						else if (dictionary2.ContainsKey("fueltype"))
 						{
 							vehicleNoInfoView.fuelType = GetFuelType(dictionary2["fueltype"].ToString());
 						}
@@ -1488,8 +1485,9 @@ public class CommonHelper
 			}.CreateEncryptor().TransformFinalBlock(bytes2, 0, bytes2.Length);
 			return Convert.ToBase64String(array, 0, array.Length);
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog("AESDecrypt异常: " + ex.Message);
 			return "";
 		}
 	}
@@ -1784,11 +1782,6 @@ public class CommonHelper
 		return ImageFormat.Jpeg;
 	}
 
-	public static bool GetDoesItExist(string carNo, ref tb_TempCarInfo tb_TempCar)
-	{
-		return false;
-	}
-
 	public static bool TYGetDoesItExist(string carNo)
 	{
 		try
@@ -1916,19 +1909,14 @@ public class CommonHelper
 		dictionary.Add("createTime", date.ToString("yyyyMMddHHmmss"));
 		dictionary.Add("updator", "A");
 		dictionary.Add("updateTime", date.ToString("yyyyMMddHHmmss"));
-		TXHttpResultModel tXHGData = GetTXHGData(MainData.TXServer + "api/closedmanage/scmaccessrecordvehicle/addOrUpdate", dictionary);
-		if (tXHGData != null)
-		{
-			_ = tXHGData.code;
-			_ = 1;
-		}
+		GetTXHGData(MainData.TXServer + "api/closedmanage/scmaccessrecordvehicle/addOrUpdate", dictionary);
 	}
 
 	public static TXHttpResultModel GetTXHGToken(string url, Dictionary<string, object> values)
 	{
 		JsonConvert.SerializeObject(values);
 		RestClient restClient = new RestClient(url);
-		restClient.Timeout = -1;
+		restClient.Timeout = 30000;
 		RestRequest restRequest = new RestRequest(Method.POST);
 		restRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 		foreach (string key in values.Keys)
@@ -1950,7 +1938,7 @@ public class CommonHelper
 		string value = JsonConvert.SerializeObject(values);
 		RestClient obj = new RestClient(url)
 		{
-			Timeout = -1
+			Timeout = 30000
 		};
 		RestRequest restRequest = new RestRequest(Method.POST);
 		restRequest.AddHeader("Content-Type", "application/json");
@@ -1983,17 +1971,10 @@ public class CommonHelper
 
 	public static void SendYiJiu(VehicleNoInfoView vehicleNoInfoView)
 	{
-		new Dictionary<string, object>();
-		PageModel pageModel = new PageModel();
-		pageModel.PageIndex = 1;
-		pageModel.PageSize = 1;
-		List<IConditionalModel> conditionalList = new List<IConditionalModel>();
-		List<tb_CarRecord> pageList = new DataServerContext<tb_CarRecord>().Current.GetPageList(conditionalList, pageModel, (tb_CarRecord it) => it.add_time, OrderByType.Desc);
-		if (pageList != null)
-		{
-			_ = pageList.Count;
-			_ = 0;
-		}
+		// TODO: Implement 易玖 vehicle record upload to MainData.cdpfUrl
+		// The old implementation was a dead stub - querying records without using results.
+		// Likely intended to call: ClientHttpV2.GetYiJiuResultModel(...)
+		LogSave.DSFLog(DateTime.Now.ToString() + "[SendYiJiu] Called but not implemented. VehicleNo: " + (vehicleNoInfoView?.VehicleNo ?? "null"));
 	}
 
 	public static void SendHeMei(VehicleNoInfoView vehicleNoInfoView)

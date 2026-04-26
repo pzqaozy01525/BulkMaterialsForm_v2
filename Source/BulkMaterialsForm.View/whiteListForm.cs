@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BST.Ticket;
+using BulkMaterialsForm.Help;
 using BulkMaterialsForm.Manager;
 using BulkMaterialsForm.Model;
 using BulkMaterialsForm.Properties;
@@ -191,7 +192,7 @@ public class whiteListForm : Form
 	{
 		try
 		{
-			DataSet dataSet = ExcelToDataSet(filePath);
+			DataSet dataSet = FormHelper.ExcelToDataSet(filePath);
 			if (dataSet == null || dataSet.Tables.Count == 0)
 			{
 				ShowMessage("数据为空！");
@@ -305,70 +306,9 @@ public class whiteListForm : Form
 		}
 	}
 
-	private DataSet ExcelToDataSet(string filePath)
-	{
-		string text = Path.GetExtension(filePath).ToLowerInvariant();
-		string[] array = new string[4] { "Microsoft.ACE.OLEDB.16.0", "Microsoft.ACE.OLEDB.15.0", "Microsoft.ACE.OLEDB.12.0", "Microsoft.Jet.OLEDB.4.0" };
-		string[] array2 = ((!(text == ".xlsx")) ? new string[1] { "Excel 12.0;HDR=YES;IMEX=1" } : new string[2] { "Excel 12.0 Xml;HDR=YES;IMEX=1", "Excel 12.0;HDR=YES;IMEX=1" });
-		string text2 = "";
-		string[] array3 = array;
-		foreach (string text3 in array3)
-		{
-			string[] array4 = array2;
-			foreach (string text4 in array4)
-			{
-				string connStr = "Provider=" + text3 + ";Data Source=" + filePath + ";Extended Properties=\"" + text4 + "\"";
-				try
-				{
-					return ReadExcelWithProvider(connStr);
-				}
-				catch (OleDbException ex)
-				{
-					text2 = ex.Message;
-					if (ex.HResult == -2147467259 || ex.Message.Contains("未注册") || ex.Message.Contains("not registered"))
-					{
-						continue;
-					}
-					throw;
-				}
-				catch (InvalidOperationException)
-				{
-				}
-			}
-		}
-		throw new InvalidOperationException("无法读取 Excel 文件。\n\n可能原因：系统未安装 Access Database Engine（数据库引擎）。\n\n解决方法：\n1. 下载并安装 AccessDatabaseEngine（64位系统）:\n   https://www.microsoft.com/zh-cn/download/details.aspx?id=54920\n\n2. 安装后重启程序再试。\n\n原始错误: " + text2);
-	}
-
-	private DataSet ReadExcelWithProvider(string connStr)
-	{
-		using OleDbConnection oleDbConnection = new OleDbConnection(connStr);
-		oleDbConnection.Open();
-		DataTable oleDbSchemaTable = oleDbConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[4] { null, null, null, "TABLE" });
-		oleDbConnection.Close();
-		if (oleDbSchemaTable == null || oleDbSchemaTable.Rows.Count == 0)
-		{
-			throw new Exception("无法读取Excel工作表");
-		}
-		string text = oleDbSchemaTable.Rows[0]["TABLE_NAME"].ToString();
-		OleDbDataAdapter oleDbDataAdapter = new OleDbDataAdapter("SELECT * FROM [" + text + "]", connStr);
-		DataSet dataSet = new DataSet();
-		oleDbDataAdapter.Fill(dataSet, "Table1");
-		return dataSet;
-	}
-
 	private void ShowMessage(string msg)
 	{
-		if (base.InvokeRequired)
-		{
-			Invoke((Action)delegate
-			{
-				MessageBox.Show(msg);
-			});
-		}
-		else
-		{
-			MessageBox.Show(msg);
-		}
+		FormHelper.ShowMessage(this, msg);
 	}
 
 	private void barButtonItem4_ItemClick(object sender, ItemClickEventArgs e)
@@ -463,18 +403,7 @@ public class whiteListForm : Form
 		return 0;
 	}
 
-	private List<int> GetIds()
-	{
-		List<int> list = new List<int>();
-		foreach (DataGridViewRow item in (IEnumerable)dataGridView1.Rows)
-		{
-			if (Convert.ToBoolean(item.Cells[0].Value))
-			{
-				list.Add(Convert.ToInt32(item.Cells["id"].Value));
-			}
-		}
-		return list;
-	}
+	private List<int> GetIds() => FormHelper.GetSelectedIds(dataGridView1);
 
 	private int pager1_EventPaging(EventPagingArg e)
 	{
@@ -661,21 +590,25 @@ public class whiteListForm : Form
 		this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
 		this.barDockControlTop.Manager = this.barManager1;
 		this.barDockControlTop.Size = new System.Drawing.Size(1138, 40);
+		this.barDockControlTop.TabIndex = 0;
 		this.barDockControlBottom.CausesValidation = false;
 		this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
 		this.barDockControlBottom.Location = new System.Drawing.Point(0, 698);
 		this.barDockControlBottom.Manager = this.barManager1;
 		this.barDockControlBottom.Size = new System.Drawing.Size(1138, 0);
+		this.barDockControlBottom.TabIndex = 0;
 		this.barDockControlLeft.CausesValidation = false;
 		this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
 		this.barDockControlLeft.Location = new System.Drawing.Point(0, 40);
 		this.barDockControlLeft.Manager = this.barManager1;
 		this.barDockControlLeft.Size = new System.Drawing.Size(0, 658);
+		this.barDockControlLeft.TabIndex = 0;
 		this.barDockControl1.CausesValidation = false;
 		this.barDockControl1.Dock = System.Windows.Forms.DockStyle.Right;
 		this.barDockControl1.Location = new System.Drawing.Point(1138, 40);
 		this.barDockControl1.Manager = this.barManager1;
 		this.barDockControl1.Size = new System.Drawing.Size(0, 658);
+		this.barDockControl1.TabIndex = 0;
 		this.tableLayoutPanel1.ColumnCount = 1;
 		this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100f));
 		this.tableLayoutPanel1.Controls.Add(this.dataGridView1, 0, 1);
@@ -689,7 +622,7 @@ public class whiteListForm : Form
 		this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 81f));
 		this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7f));
 		this.tableLayoutPanel1.Size = new System.Drawing.Size(1138, 658);
-		this.tableLayoutPanel1.TabIndex = 5;
+		this.tableLayoutPanel1.TabIndex = 0;
 		this.dataGridView1.AllowUserToAddRows = false;
 		this.dataGridView1.AllowUserToDeleteRows = false;
 		this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -700,7 +633,7 @@ public class whiteListForm : Form
 		this.dataGridView1.ReadOnly = true;
 		this.dataGridView1.RowTemplate.Height = 26;
 		this.dataGridView1.Size = new System.Drawing.Size(1132, 553);
-		this.dataGridView1.TabIndex = 1;
+		this.dataGridView1.TabIndex = 20;
 		this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(dataGridView1_CellClick);
 		this.Column1.HeaderText = "";
 		this.Column1.Name = "Column1";
@@ -725,7 +658,7 @@ public class whiteListForm : Form
 		this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50f));
 		this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50f));
 		this.tableLayoutPanel2.Size = new System.Drawing.Size(1132, 60);
-		this.tableLayoutPanel2.TabIndex = 2;
+		this.tableLayoutPanel2.TabIndex = 10;
 		this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label2.AutoSize = true;
 		this.label2.BackColor = System.Drawing.Color.Transparent;
@@ -733,13 +666,13 @@ public class whiteListForm : Form
 		this.label2.ForeColor = System.Drawing.Color.Black;
 		this.label2.Name = "label2";
 		this.label2.Size = new System.Drawing.Size(72, 20);
-		this.label2.TabIndex = 39;
+		this.label2.TabIndex = 38;
 		this.label2.Text = "车牌号：";
 		this.textBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
 		this.textBox1.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.textBox1.Name = "textBox1";
 		this.textBox1.Size = new System.Drawing.Size(220, 29);
-		this.textBox1.TabIndex = 38;
+		this.textBox1.TabIndex = 37;
 		this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label3.AutoSize = true;
 		this.label3.BackColor = System.Drawing.Color.Transparent;
@@ -747,7 +680,7 @@ public class whiteListForm : Form
 		this.label3.ForeColor = System.Drawing.Color.Black;
 		this.label3.Name = "label3";
 		this.label3.Size = new System.Drawing.Size(60, 20);
-		this.label3.TabIndex = 42;
+		this.label3.TabIndex = 40;
 		this.label3.Text = "名称：";
 		this.textBox2.Anchor = System.Windows.Forms.AnchorStyles.Left;
 		this.textBox2.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
@@ -761,12 +694,12 @@ public class whiteListForm : Form
 		this.label4.ForeColor = System.Drawing.Color.Black;
 		this.label4.Name = "label4";
 		this.label4.Size = new System.Drawing.Size(84, 20);
-		this.label4.TabIndex = 43;
+		this.label4.TabIndex = 42;
 		this.label4.Text = "手机号：";
 		this.textBox3.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
 		this.textBox3.Name = "textBox3";
 		this.textBox3.Size = new System.Drawing.Size(220, 29);
-		this.textBox3.TabIndex = 44;
+		this.textBox3.TabIndex = 43;
 		this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
 		this.label5.AutoSize = true;
 		this.label5.BackColor = System.Drawing.Color.Transparent;
@@ -774,7 +707,7 @@ public class whiteListForm : Form
 		this.label5.ForeColor = System.Drawing.Color.Black;
 		this.label5.Name = "label5";
 		this.label5.Size = new System.Drawing.Size(84, 20);
-		this.label5.TabIndex = 45;
+		this.label5.TabIndex = 44;
 		this.label5.Text = "有效状态：";
 		this.comboBoxValidStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 		this.comboBoxValidStatus.Font = new System.Drawing.Font("微软雅黑", 9f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
@@ -783,7 +716,7 @@ public class whiteListForm : Form
 		this.comboBoxValidStatus.Name = "comboBoxValidStatus";
 		this.comboBoxValidStatus.SelectedIndex = 0;
 		this.comboBoxValidStatus.Size = new System.Drawing.Size(220, 29);
-		this.comboBoxValidStatus.TabIndex = 46;
+		this.comboBoxValidStatus.TabIndex = 45;
 		this.pager1.Dock = System.Windows.Forms.DockStyle.Fill;
 		this.pager1.Location = new System.Drawing.Point(3, 614);
 		this.pager1.Name = "pager1";
@@ -792,7 +725,7 @@ public class whiteListForm : Form
 		this.pager1.PageCurrent = 0;
 		this.pager1.PageSize = 20;
 		this.pager1.Size = new System.Drawing.Size(1132, 41);
-		this.pager1.TabIndex = 3;
+		this.pager1.TabIndex = 30;
 		this.pager1.EventPaging += new BST.Ticket.EventPagingHandler(pager1_EventPaging);
 		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 12f);
 		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

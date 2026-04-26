@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BulkMaterialsForm.Help;
 
 namespace BulkMaterialsForm.Views;
 
@@ -28,7 +29,7 @@ public class ConfirmPassForm : Form
 
 	private void button4_Click(object sender, EventArgs e)
 	{
-		if (textBox1.Text.Equals("13607665046"))
+		if (textBox1.Text == MainData.ACpassword)
 		{
 			isSvae = true;
 			Close();

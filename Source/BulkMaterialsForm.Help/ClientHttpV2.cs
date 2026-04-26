@@ -41,6 +41,7 @@ public class ClientHttpV2
 	public static System.Timers.Timer timer = new System.Timers.Timer(10000.0);
 
 	public static bool isLoadVehicle = false;
+	public static int isLoadingVehicle = 0;
 
 	public static List<string> GetCurrentComputerIP()
 	{
@@ -60,19 +61,25 @@ public class ClientHttpV2
 	{
 		try
 		{
-			if (!isLoadVehicle)
+			if (Interlocked.CompareExchange(ref isLoadingVehicle, 1, 0) == 0)
 			{
-				isLoadVehicle = true;
 				Task.Factory.StartNew(delegate
 				{
-					GetVehicle();
-					isLoadVehicle = false;
+					try
+					{
+						GetVehicle();
+					}
+					finally
+					{
+						Interlocked.Exchange(ref isLoadingVehicle, 0);
+					}
 				});
 			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
-			isLoadVehicle = false;
+			LogSave.SaveExeLog($"[ListenForRequests] 预加载车辆失败: {ex.Message}");
+			Interlocked.Exchange(ref isLoadingVehicle, 0);
 		}
 	}
 
@@ -101,8 +108,9 @@ public class ClientHttpV2
 			startThread = new Thread(ListenForRequests);
 			startThread.Start();
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[Init] 启动HTTP服务失败: {ex.Message}");
 			serverComet = new HttpListener();
 		}
 	}
@@ -117,8 +125,9 @@ public class ClientHttpV2
 				Task.Factory.StartNew(HandleRequestRecordComet, context);
 			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[ListenForRequests] 监听请求异常: {ex.Message}");
 		}
 	}
 
@@ -159,7 +168,7 @@ public class ClientHttpV2
 							ConditionalModel conditionalModel = new ConditionalModel();
 							conditionalModel.FieldName = "out_type";
 							conditionalModel.ConditionalType = ConditionalType.In;
-							conditionalModel.FieldValue = new object[] { outType, "服务器下行" };
+							conditionalModel.FieldValue = outType;
 							list.Add(conditionalModel);
 						}
 						DataServerContext<tb_CarRecord> dataServerContext = new DataServerContext<tb_CarRecord>();
@@ -323,8 +332,9 @@ public class ClientHttpV2
 				SendData(httpListenerContext.Response, resultModel);
 			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[HandleRequestRecordComet] 处理请求异常: {ex.Message}");
 		}
 	}
 
@@ -516,7 +526,7 @@ public class ClientHttpV2
 			string value = JsonConvert.SerializeObject(values);
 			RestClient obj = new RestClient(url)
 			{
-				Timeout = -1
+				Timeout = 30000
 			};
 			RestRequest restRequest = new RestRequest(Method.POST);
 			restRequest.AddHeader("Content-Type", "application/json");
@@ -528,8 +538,9 @@ public class ClientHttpV2
 			}
 			return null;
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[GetClientResultModel] 请求异常: {ex.Message}");
 			return null;
 		}
 	}
@@ -541,7 +552,7 @@ public class ClientHttpV2
 			string value = JsonConvert.SerializeObject(values);
 			RestClient obj = new RestClient(url)
 			{
-				Timeout = -1
+				Timeout = 30000
 			};
 			RestRequest restRequest = new RestRequest(Method.POST);
 			restRequest.AddHeader("Content-Type", "application/json");
@@ -554,8 +565,9 @@ public class ClientHttpV2
 			}
 			return null;
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[GetYiJiuResultModel] 请求异常: {ex.Message}");
 			return null;
 		}
 	}

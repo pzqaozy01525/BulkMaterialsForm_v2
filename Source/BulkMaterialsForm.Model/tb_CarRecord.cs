@@ -60,4 +60,7 @@ public class tb_CarRecord
 
 	[SugarColumn(IsNullable = true)]
 	public string cargoWeight { get; set; }
+
+	[SugarColumn(IsNullable = true)]
+	public string license_color { get; set; }
 }

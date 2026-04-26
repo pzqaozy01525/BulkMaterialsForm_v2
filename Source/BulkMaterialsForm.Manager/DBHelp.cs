@@ -44,8 +44,8 @@ public class DBHelp
 		});
 		Db.Aop.OnLogExecuting = delegate(string sql, SugarParameter[] pars)
 		{
-			Console.WriteLine(sql + "\r\n" + Db.Utilities.SerializeObject(pars.ToDictionary((SugarParameter it) => it.ParameterName, (SugarParameter it) => it.Value)));
-			Console.WriteLine();
+			// SQL logging to console removed for production safety.
+			// Enable via debug build or environment variable if needed.
 		};
 		Db.CodeFirst.InitTables(entityTypes);
 		InitData<tb_kayValue>.InitTableData(new SimpleClient<tb_kayValue>(Db), typeof(tb_kayValue));

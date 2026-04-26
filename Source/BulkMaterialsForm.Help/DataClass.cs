@@ -10,16 +10,7 @@ namespace BulkMaterialsForm.Help;
 
 public class DataClass
 {
-	public static SqlConnection My_con;
-
 	public static SqlConnection mySqlConnection;
-
-	public static SqlConnection getcon()
-	{
-		My_con = new SqlConnection(MainData.M_str_sqlcon);
-		My_con.Open();
-		return My_con;
-	}
 
 	public static bool connectTestW()
 	{
@@ -33,8 +24,9 @@ public class DataClass
 				result = true;
 			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[connectTestW] 数据库连接失败: {ex.Message}");
 		}
 		finally
 		{
@@ -45,15 +37,22 @@ public class DataClass
 
 	public static DataTable GetDatatable(string str, ref string msg)
 	{
+		return GetDatatable(str, null, ref msg);
+	}
+
+	public static DataTable GetDatatable(string sql, SqlParameter[] parameters, ref string msg)
+	{
 		using SqlConnection sqlConnection = new SqlConnection(MainData.DBServer);
 		try
 		{
-			SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(str, sqlConnection);
-			DataSet dataSet = new DataSet();
-			sqlDataAdapter.Fill(dataSet, "tables");
-			new DataTable();
-			DataTable result = dataSet.Tables[0];
-			sqlConnection.Close();
+			SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sql, sqlConnection);
+			if (parameters != null)
+			{
+				foreach (SqlParameter p in parameters)
+					sqlDataAdapter.SelectCommand.Parameters.Add(p);
+			}
+			DataTable result = new DataTable();
+			sqlDataAdapter.Fill(result);
 			return result;
 		}
 		catch (Exception ex)

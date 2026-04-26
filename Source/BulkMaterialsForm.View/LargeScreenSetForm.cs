@@ -302,6 +302,7 @@ public class LargeScreenSetForm : Form
 	private void barButtonItem2_ItemClick(object sender, ItemClickEventArgs e)
 	{
 		VehicleNoInfoView vehicleNoInfoView = new VehicleNoInfoView();
+		// TODO: Replace hardcoded plate with dynamic input or first available record
 		vehicleNoInfoView.VehicleNo = "豫A12345";
 		vehicleNoInfoView.emissionStandard = "国5";
 		vehicleNoInfoView.fuelType = "汽油";

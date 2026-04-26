@@ -17,6 +17,7 @@ using BulkMaterialsForm.Model;
 using BulkMaterialsForm.Model.View;
 using BulkMaterialsForm.Properties;
 using DevExpress.XtraBars;
+using BulkMaterialsForm.Help;
 using SqlSugar;
 
 namespace BulkMaterialsForm.View;
@@ -185,17 +186,7 @@ public class FDLRecordForm : Form
 
 	private void ShowMessage(string msg)
 	{
-		if (base.InvokeRequired)
-		{
-			Invoke((Action)delegate
-			{
-				MessageBox.Show(msg);
-			});
-		}
-		else
-		{
-			MessageBox.Show(msg);
-		}
+		FormHelper.ShowMessage(this, msg);
 	}
 
 	private int BindDGV()

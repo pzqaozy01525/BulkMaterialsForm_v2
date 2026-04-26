@@ -217,7 +217,7 @@ public class WindowsXFTTSUtils
 			{
 				return false;
 			}
-			errorCode = QTTSTextPut(Ptr2Str(p), text, (uint)Encoding.Default.GetByteCount(text), string.Empty);
+			errorCode = QTTSTextPut(Ptr2Str(p), text, (uint)Encoding.Unicode.GetByteCount(text), string.Empty); // TODO: 确认编码（原文 Encoding.Default）
 			if (errorCode != 0)
 			{
 				return false;
@@ -312,6 +312,6 @@ public class WindowsXFTTSUtils
 			list.Add(Marshal.ReadByte(p));
 			p += 1;
 		}
-		return Encoding.Default.GetString(list.ToArray());
+					return Encoding.GetEncoding("GBK").GetString(list.ToArray()); // TODO: 确认编码（原文 Encoding.Default）
 	}
 }

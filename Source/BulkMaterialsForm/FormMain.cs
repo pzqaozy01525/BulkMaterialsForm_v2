@@ -146,7 +146,6 @@ public class FormMain : Form
 	public FormMain()
 	{
 		InitializeComponent();
-		Control.CheckForIllegalCrossThreadCalls = false;
 		base.Load += FormMain_Load;
 		base.FormClosing += FormMain_FormClosing;
 	}
@@ -158,6 +157,7 @@ public class FormMain : Form
 			timer1.Stop();
 			timer2.Stop();
 			timer3.Stop();
+			TCPSeerver.StopServer();
 			MqttHostService.Close();
 			foreach (Control control in tableLayoutPanel2.Controls)
 			{
@@ -168,15 +168,15 @@ public class FormMain : Form
 				}
 			}
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[FormMain_FormClosing] 关闭清理异常: {ex.Message}");
 		}
-		Process[] processesByName = Process.GetProcessesByName("BulkMaterialsForm");
-		for (int i = 0; i < processesByName.Length; i++)
+		finally
 		{
-			processesByName[i].Kill();
+			LogSave.SaveExeLog("[FormMain_FormClosing] 程序正常退出");
 		}
-		Environment.Exit(0);
+		Application.Exit();
 	}
 
 	private void FormMain_Load(object sender, EventArgs e)
@@ -185,8 +185,9 @@ public class FormMain : Form
 		{
 			new DataServerContext<tb_tempVehicle>().Current.GetList();
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			LogSave.SaveExeLog($"[FormMain_Load] 预加载车辆数据失败: {ex.Message}");
 		}
 		pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 		MqttHostService.Init();
@@ -210,14 +211,14 @@ public class FormMain : Form
 				if (companyControlInfo != null && companyControlInfo.ContainsKey("data") && companyControlInfo.ContainsKey("result") && companyControlInfo["result"].ToString().Equals("success"))
 				{
 					companyControlInfo = JsonConvert.DeserializeObject<Dictionary<string, object>>(companyControlInfo["data"].ToString());
-					if (companyControlInfo != null)
+					if (companyControlInfo != null && companyControlInfo.ContainsKey("companyName") && companyControlInfo.ContainsKey("controlRunTime"))
 					{
-						MainData.GLcompanyName = companyControlInfo["companyName"].ToString();
-						MainData.GLcontrolRunTime = companyControlInfo["controlRunTime"].ToString();
-						MainData.GLcontrolEndTime = companyControlInfo["controlEndTime"].ToString();
-						MainData.GLcontrolStrategy = CommonHelper.GetControlStrategy(companyControlInfo["controlStrategy"].ToString());
-						MainData.GLresponseLevel = CommonHelper.GetResponseLevel(companyControlInfo["responseLevel"].ToString());
-						MainData.GLcontrolLevel = CommonHelper.GetControlLevel(companyControlInfo["controlLevel"].ToString());
+						MainData.GLcompanyName = companyControlInfo["companyName"]?.ToString() ?? "";
+						MainData.GLcontrolRunTime = companyControlInfo["controlRunTime"]?.ToString() ?? "";
+						MainData.GLcontrolEndTime = companyControlInfo["controlEndTime"]?.ToString() ?? "";
+						MainData.GLcontrolStrategy = companyControlInfo.ContainsKey("controlStrategy") ? CommonHelper.GetControlStrategy(companyControlInfo["controlStrategy"].ToString()) : "";
+						MainData.GLresponseLevel = companyControlInfo.ContainsKey("responseLevel") ? CommonHelper.GetResponseLevel(companyControlInfo["responseLevel"].ToString()) : "";
+						MainData.GLcontrolLevel = companyControlInfo.ContainsKey("controlLevel") ? CommonHelper.GetControlLevel(companyControlInfo["controlLevel"].ToString()) : "";
 						MainData.GLcontrolUpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵企业名称", MainData.GLcompanyName, MainData.Spath);
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵管控开始时间", MainData.GLcontrolRunTime, MainData.Spath);
@@ -226,6 +227,10 @@ public class FormMain : Form
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵响应等级", MainData.GLresponseLevel, MainData.Spath);
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵预警等级", MainData.GLcontrolLevel, MainData.Spath);
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵管控更新时间", MainData.GLcontrolUpdateTime, MainData.Spath);
+					}
+					else
+					{
+						LogSave.SaveExeLog("[FormMain] 高凌企业管控信息格式异常，缺少必要字段");
 					}
 				}
 			}
@@ -327,7 +332,7 @@ public class FormMain : Form
 			}
 			Task.Factory.StartNew(delegate
 			{
-				Init();
+				InitData();
 			});
 			timer2.Enabled = true;
 			timer2.Interval = 10800000;
@@ -381,11 +386,6 @@ public class FormMain : Form
 		{
 			dataGridView1.Columns["buhuo"].Visible = false;
 		}
-	}
-
-	public void Init()
-	{
-		MainData.IsInit = true;
 	}
 
 	private void MainData_cameraSnap(cmdModel model)
@@ -628,12 +628,7 @@ public class FormMain : Form
 
 	private void barButtonItem4_ItemClick(object sender, ItemClickEventArgs e)
 	{
-		Process[] processesByName = Process.GetProcessesByName("BulkMaterialsForm");
-		for (int i = 0; i < processesByName.Length; i++)
-		{
-			processesByName[i].Kill();
-		}
-		Environment.Exit(0);
+		Application.Exit();
 	}
 
 	private void barButtonItem5_ItemClick(object sender, ItemClickEventArgs e)
@@ -653,6 +648,7 @@ public class FormMain : Form
 			if (MainData.DJPT == "消纳场")
 			{
 				string msg = "";
+				// TODO: Replace hardcoded test plate with dynamic input or first available record
 				if (CommonHelper.XNCVerify("豫A12345", "绿色", "123", "1", ref msg))
 				{
 					MessageBox.Show("上传成功");
@@ -666,6 +662,7 @@ public class FormMain : Form
 			{
 				string msg2 = "";
 				VehicleNoInfoView vehicleNoInfoView = new VehicleNoInfoView();
+				// TODO: Replace hardcoded test plate with dynamic input or first available record
 				if (CommonHelper.GLVerify("沪A90157D", "绿色", MainData.GLExitPort, ref msg2, ref vehicleNoInfoView))
 				{
 					Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -695,8 +692,10 @@ public class FormMain : Form
 			else if (MainData.DJPT == "腾跃")
 			{
 				string msg3 = "";
+				// TODO: Replace hardcoded test plates with dynamic input or first available record
 				if (CommonHelper.TYVerify("豫A12345", "绿色", MainData.TYEnterChannel, Application.StartupPath + "\\Image\\20230607090240122.jpg", ref msg3))
 				{
+					// TODO: Use same plate as TYVerify call above
 					if (CommonHelper.TYSaveRecord("豫A12346", "绿色", MainData.TYEnterChannel, Application.StartupPath + "\\Image\\20230607090240122.jpg"))
 					{
 						MessageBox.Show("上传成功");
@@ -715,6 +714,7 @@ public class FormMain : Form
 			{
 				string msg4 = "";
 				VehicleNoInfoView vehicleNoInfoView2 = new VehicleNoInfoView();
+				// TODO: Replace hardcoded test plate with dynamic input or first available record
 				if (CommonHelper.AnCheVerify("豫V38CK9", "0", ref msg4, ref vehicleNoInfoView2, "01"))
 				{
 					DateTime now = DateTime.Now;
@@ -743,20 +743,22 @@ public class FormMain : Form
 						MessageBox.Show("通道不存在");
 						return;
 					}
-					tb_CarRecord model2 = new DataServerContext<tb_CarRecord>().Current.GetModel((tb_CarRecord it) => it.car_no == "豫C51L10");
+					tb_CarRecord model2 = (from it in new DataServerContext<tb_CarRecord>().Current.GetList()
+						orderby it.id descending
+						select it).FirstOrDefault();
 					if (model2 == null)
 					{
-						MessageBox.Show("记录不存在");
+						MessageBox.Show("今日暂无通行记录");
 						return;
 					}
 					VehicleNoInfoView vehicleNoInfoView3 = new VehicleNoInfoView();
-					vehicleNoInfoView3.VehicleNo = "豫C51L10";
+					vehicleNoInfoView3.VehicleNo = model2.car_no;
 					vehicleNoInfoView3.AddTime = DateTime.Now;
 					vehicleNoInfoView3.ChannelName = model.ChannelName;
 					vehicleNoInfoView3.DeviceName = tb_Device2[0].CameraName;
 					vehicleNoInfoView3.ChannelType = model.ChannelType;
 					vehicleNoInfoView3.ImagePath = model2.front_image;
-					vehicleNoInfoView3.licenseColor = "蓝色";
+					vehicleNoInfoView3.licenseColor = model2.license_color;
 					vehicleNoInfoView3.ChannelId = tb_Device2[0].ChannelNo;
 					vehicleNoInfoView3.devId = tb_Device2[0].id;
 					string msg5 = "";
@@ -906,14 +908,14 @@ public class FormMain : Form
 				if (companyControlInfo != null && companyControlInfo.ContainsKey("data") && companyControlInfo.ContainsKey("result") && companyControlInfo["result"].ToString().Equals("success"))
 				{
 					companyControlInfo = JsonConvert.DeserializeObject<Dictionary<string, object>>(companyControlInfo["data"].ToString());
-					if (companyControlInfo != null)
+					if (companyControlInfo != null && companyControlInfo.ContainsKey("companyName") && companyControlInfo.ContainsKey("controlRunTime"))
 					{
-						MainData.GLcompanyName = companyControlInfo["companyName"].ToString();
-						MainData.GLcontrolRunTime = companyControlInfo["controlRunTime"].ToString();
-						MainData.GLcontrolEndTime = companyControlInfo["controlEndTime"].ToString();
-						MainData.GLcontrolStrategy = CommonHelper.GetControlStrategy(companyControlInfo["controlStrategy"].ToString());
-						MainData.GLresponseLevel = CommonHelper.GetResponseLevel(companyControlInfo["responseLevel"].ToString());
-						MainData.GLcontrolLevel = CommonHelper.GetControlLevel(companyControlInfo["controlLevel"].ToString());
+						MainData.GLcompanyName = companyControlInfo["companyName"]?.ToString() ?? "";
+						MainData.GLcontrolRunTime = companyControlInfo["controlRunTime"]?.ToString() ?? "";
+						MainData.GLcontrolEndTime = companyControlInfo["controlEndTime"]?.ToString() ?? "";
+						MainData.GLcontrolStrategy = companyControlInfo.ContainsKey("controlStrategy") ? CommonHelper.GetControlStrategy(companyControlInfo["controlStrategy"].ToString()) : "";
+						MainData.GLresponseLevel = companyControlInfo.ContainsKey("responseLevel") ? CommonHelper.GetResponseLevel(companyControlInfo["responseLevel"].ToString()) : "";
+						MainData.GLcontrolLevel = companyControlInfo.ContainsKey("controlLevel") ? CommonHelper.GetControlLevel(companyControlInfo["controlLevel"].ToString()) : "";
 						MainData.GLcontrolUpdateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵企业名称", MainData.GLcompanyName, MainData.Spath);
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵管控开始时间", MainData.GLcontrolRunTime, MainData.Spath);
@@ -922,6 +924,10 @@ public class FormMain : Form
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵响应等级", MainData.GLresponseLevel, MainData.Spath);
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵预警等级", MainData.GLcontrolLevel, MainData.Spath);
 						New_IniFile.WriteContentValue("窗体框架配制", "高陵管控更新时间", MainData.GLcontrolUpdateTime, MainData.Spath);
+					}
+					else
+					{
+						LogSave.SaveExeLog("[FormMain] 高凌企业管控信息格式异常，缺少必要字段");
 					}
 				}
 			}
@@ -932,7 +938,6 @@ public class FormMain : Form
 			}
 			if (MainData.isInst == "2")
 			{
-				_ = MainData.IsInit;
 			}
 			Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(CommonHelper.GetGLResultModel(MainData.ServerIP + "ExpTime/GetExpTime?register=" + Activation.softAuthorize.GetInfo() + "&project_name=" + MainData.XMMC, ""));
 			if (dictionary != null && dictionary.ContainsKey("data") && dictionary.ContainsKey("code") && dictionary["code"].ToString().Equals("200"))
@@ -950,16 +955,17 @@ public class FormMain : Form
 			if (DateTime.Now > MainData.ExpTime)
 			{
 				int days = (DateTime.Now - MainData.ExpTime).Days;
-				if (days <= 15)
+				Invoke(new Action(() =>
 				{
-					label4.Text = "系统维护以逾期" + days + "天,请尽快续费超过15天将无法连接平台";
-				}
-				else
-				{
-					MainData.IsBecomeDue = true;
-					label4.Text = "系统维护以逾期" + days + "天,无法连接平台使用";
-				}
-				Text = MainData.XMMC + "系统维护到期时间:" + MainData.ExpTime.ToString();
+					if (days <= 15)
+						label4.Text = "系统维护以逾期" + days + "天,请尽快续费超过15天将无法连接平台";
+					else
+					{
+						MainData.IsBecomeDue = true;
+						label4.Text = "系统维护以逾期" + days + "天,无法连接平台使用";
+					}
+					Text = MainData.XMMC + "系统维护到期时间:" + MainData.ExpTime.ToString();
+				}));
 			}
 		});
 	}
@@ -986,8 +992,9 @@ public class FormMain : Form
 					CommonHelper.AnCheToken(ref msg);
 				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				LogSave.SaveExeLog($"[timer2_Tick] Token刷新失败: {ex.Message}");
 			}
 		});
 	}
@@ -1038,12 +1045,10 @@ public class FormMain : Form
 						if (item.out_type.Equals("入口"))
 						{
 							text = "in";
-							_ = MainData.GLEnterPort;
 						}
 						else
 						{
 							text = "out";
-							_ = MainData.GLExitPort;
 						}
 						Dictionary<string, object> dictionary = new Dictionary<string, object>();
 						dictionary.Add("license", item.car_no);
@@ -1119,10 +1124,16 @@ public class FormMain : Form
 											LogSave.DBLog(DateTime.Now.ToString() + "进入");
 											if (tb_Car != null)
 											{
-												string text3 = $"SELECT * FROM 称重记录 WHERE 车号='{item.car_no}' and 过总时间 >='{tb_Car.add_time}' and 过总时间 <='{item.add_time}'";
-												LogSave.DBLog(DateTime.Now.ToString() + "查询SQL" + text3);
-												string msg2 = "";
-												DataTable datatable = DataClass.GetDatatable(text3, ref msg2);
+string text3 = "SELECT * FROM 称重记录 WHERE 车号=@car_no and 过总时间 >=@start_time and 过总时间 <=@end_time";
+LogSave.DBLog(DateTime.Now.ToString() + "查询SQL" + text3);
+string msg2 = "";
+SqlParameter[] parameters = new SqlParameter[]
+{
+	new SqlParameter("@car_no", item.car_no),
+	new SqlParameter("@start_time", tb_Car.add_time),
+	new SqlParameter("@end_time", item.add_time)
+};
+DataTable datatable = DataClass.GetDatatable(text3, parameters, ref msg2);
 												if (datatable != null)
 												{
 													LogSave.DBLog(DateTime.Now.ToString() + "查询：" + JsonConvert.SerializeObject(datatable));
@@ -1345,7 +1356,6 @@ public class FormMain : Form
 							}, (tb_CarRecord p) => p.id == item.id);
 						}
 					}
-					_ = MainData.TXIsOpen;
 					Thread.Sleep(200);
 				}
 			}
@@ -1489,40 +1499,31 @@ public class FormMain : Form
 		new exeRecordForm().ShowDialog();
 	}
 
-	private void barButtonItem15_ItemClick(object sender, ItemClickEventArgs e)
+	private void LaunchExternalTool(string relativePath)
 	{
 		try
 		{
-			ProcessStartInfo startInfo = new ProcessStartInfo(Application.StartupPath + "\\参数配置V4.43.72.exe")
+			string fullPath = Path.Combine(Application.StartupPath, relativePath);
+			ProcessStartInfo startInfo = new ProcessStartInfo(fullPath)
 			{
 				UseShellExecute = true
 			};
-			Process process = new Process();
-			process.StartInfo = startInfo;
-			process.Start();
+			Process.Start(startInfo);
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine(ex.Message);
+			LogSave.SaveExeLog($"[LaunchExternalTool] 启动失败 ({relativePath}): {ex.Message}");
 		}
+	}
+
+	private void barButtonItem15_ItemClick(object sender, ItemClickEventArgs e)
+	{
+		LaunchExternalTool("参数配置V4.43.72.exe");
 	}
 
 	private void barButtonItem16_ItemClick(object sender, ItemClickEventArgs e)
 	{
-		try
-		{
-			ProcessStartInfo startInfo = new ProcessStartInfo(Application.StartupPath + "\\LedshowZK\\LedshowZK.exe")
-			{
-				UseShellExecute = true
-			};
-			Process process = new Process();
-			process.StartInfo = startInfo;
-			process.Start();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine(ex.Message);
-		}
+		LaunchExternalTool("LedshowZK\\LedshowZK.exe");
 	}
 
 	private void barButtonItem17_ItemClick(object sender, ItemClickEventArgs e)
@@ -1537,20 +1538,7 @@ public class FormMain : Form
 
 	private void barButtonItem19_ItemClick(object sender, ItemClickEventArgs e)
 	{
-		try
-		{
-			ProcessStartInfo startInfo = new ProcessStartInfo(Application.StartupPath + "\\XH\\ETH_Config_V110.exe")
-			{
-				UseShellExecute = true
-			};
-			Process process = new Process();
-			process.StartInfo = startInfo;
-			process.Start();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine(ex.Message);
-		}
+		LaunchExternalTool("XH\\ETH_Config_V110.exe");
 	}
 
 	private void timer5_Tick(object sender, EventArgs e)
@@ -1570,7 +1558,7 @@ public class FormMain : Form
 				sqlConnection.Open();
 				using SqlCommand sqlCommand = new SqlCommand(cmdText, sqlConnection);
 				sqlCommand.ExecuteNonQuery();
-				Console.WriteLine("数据库备份成功。");
+				LogSave.SaveExeLog($"[timer5] 数据库备份成功: {text}");
 			}
 			if (DateTime.Now.Hour == 8 && DateTime.Now.Minute == 0 && MainData.DJPT == "天地人车")
 			{
@@ -1580,18 +1568,20 @@ public class FormMain : Form
 					tb_Channel model = new DataServerContext<tb_Channel>().Current.GetModel((tb_Channel it) => it.id == tb_Device2[0].ChannelNo);
 					if (model != null)
 					{
-						tb_CarRecord model2 = new DataServerContext<tb_CarRecord>().Current.GetModel((tb_CarRecord it) => it.car_no == "豫C51L10");
+						tb_CarRecord model2 = (from it in new DataServerContext<tb_CarRecord>().Current.GetList()
+							orderby it.id descending
+							select it).FirstOrDefault();
 						if (model2 != null)
 						{
 							VehicleNoInfoView vehicleNoInfoView = new VehicleNoInfoView
 							{
-								VehicleNo = "豫C51L10",
+								VehicleNo = model2.car_no,
 								AddTime = DateTime.Now,
 								ChannelName = model.ChannelName,
 								DeviceName = tb_Device2[0].CameraName,
 								ChannelType = model.ChannelType,
 								ImagePath = model2.front_image,
-								licenseColor = "蓝色",
+								licenseColor = model2.license_color,
 								ChannelId = tb_Device2[0].ChannelNo,
 								devId = tb_Device2[0].id
 							};
@@ -1615,18 +1605,20 @@ public class FormMain : Form
 					tb_Channel model3 = new DataServerContext<tb_Channel>().Current.GetModel((tb_Channel it) => it.id == tb_Device3[1].ChannelNo);
 					if (model3 != null)
 					{
-						tb_CarRecord model4 = new DataServerContext<tb_CarRecord>().Current.GetModel((tb_CarRecord it) => it.car_no == "豫C51L10");
+						tb_CarRecord model4 = (from it in new DataServerContext<tb_CarRecord>().Current.GetList()
+							orderby it.id descending
+							select it).FirstOrDefault();
 						if (model4 != null)
 						{
 							VehicleNoInfoView vehicleNoInfoView2 = new VehicleNoInfoView
 							{
-								VehicleNo = "豫C51L10",
+								VehicleNo = model4.car_no,
 								AddTime = DateTime.Now,
 								ChannelName = model3.ChannelName,
 								DeviceName = tb_Device3[1].CameraName,
 								ChannelType = model3.ChannelType,
 								ImagePath = model4.front_image,
-								licenseColor = "蓝色",
+								licenseColor = model4.license_color,
 								ChannelId = tb_Device3[0].ChannelNo,
 								devId = tb_Device3[1].id
 							};
@@ -1686,13 +1678,9 @@ public class FormMain : Form
 
 	private void barButtonItem22_ItemClick(object sender, ItemClickEventArgs e)
 	{
-		tb_CarRecord tb_CarRecord2 = (from it in new DataServerContext<tb_CarRecord>().Current.GetList((tb_CarRecord it) => it.car_no == "豫A6S2D9" && it.add_time >= DateTime.Now.Date)
-			orderby it.id descending
-			select it).FirstOrDefault();
-		if (tb_CarRecord2 != null)
-		{
-			MessageBox.Show(JsonConvert.SerializeObject(tb_CarRecord2));
-		}
+		// TODO: Implement diagnostic query for 高凌/安车 platform
+		LogSave.SaveExeLog("[barButtonItem22] Diagnostic query triggered (placeholder)");
+		MessageBox.Show("诊断查询功能待实现");
 	}
 
 	private void barButtonItem23_ItemClick(object sender, ItemClickEventArgs e)

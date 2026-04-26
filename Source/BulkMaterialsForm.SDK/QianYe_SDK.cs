@@ -836,7 +836,7 @@ public class QianYe_SDK
 				uiCount = 1
 			};
 			string text = Path.Combine(Application.StartupPath, tHandle + "_lpr_" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".ini");
-			byte[] bytes = Encoding.Default.GetBytes(text);
+			byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(text);
 			ptBlackWhiteListCount.aucLplPath = new byte[256];
 			bytes.CopyTo(ptBlackWhiteListCount.aucLplPath, 0);
 			if (Net_BlackWhiteListSetup(ref ptLprResult, ref ptBlackWhiteListCount) != 0)
@@ -872,7 +872,7 @@ public class QianYe_SDK
 				uiCount = Count
 			};
 			string text = Path.Combine(Application.StartupPath, tHandle + "_lpr_" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".ini");
-			byte[] bytes = Encoding.Default.GetBytes(text);
+			byte[] bytes = Encoding.GetEncoding("GBK").GetBytes(text);
 			ptBlackWhiteListCount.aucLplPath = new byte[256];
 			bytes.CopyTo(ptBlackWhiteListCount.aucLplPath, 0);
 			if (Net_BlackWhiteListSetup(ptLprResult, ref ptBlackWhiteListCount) != 0)
